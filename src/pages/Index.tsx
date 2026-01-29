@@ -3,12 +3,12 @@ import { useClanData } from '@/hooks/useClanData';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { Navigation } from '@/components/Navigation';
 import { MembersTable } from '@/components/MembersTable';
-import { WarLogTable } from '@/components/WarLogTable';
+import { RiverRaceTable } from '@/components/RiverRaceTable';
 import { Loader2 } from 'lucide-react';
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<'members' | 'warlog'>('members');
-  const { members, warLog, previousMembers, changedFields, isLoading, error, lastUpdated } = useClanData();
+  const [activeTab, setActiveTab] = useState<'members' | 'riverrace'>('members');
+  const { members, riverRace, riverRaceDeltas, previousMembers, changedFields, isLoading, error, lastUpdated } = useClanData();
 
   const topTrophies = members.length > 0 ? Math.max(...members.map(m => m.trophies)) : 0;
 
@@ -54,7 +54,7 @@ const Index = () => {
               changedFields={changedFields}
             />
           ) : (
-            <WarLogTable warLog={warLog} />
+            <RiverRaceTable riverRace={riverRace} deltas={riverRaceDeltas} />
           )}
         </div>
       </div>

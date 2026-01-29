@@ -1,8 +1,8 @@
-import { Users, Swords } from 'lucide-react';
+import { Users, Ship } from 'lucide-react';
 
 interface NavigationProps {
-  activeTab: 'members' | 'warlog';
-  onTabChange: (tab: 'members' | 'warlog') => void;
+  activeTab: 'members' | 'riverrace';
+  onTabChange: (tab: 'members' | 'riverrace') => void;
 }
 
 export function Navigation({ activeTab, onTabChange }: NavigationProps) {
@@ -16,11 +16,11 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
         Clan Members
       </button>
       <button
-        onClick={() => onTabChange('warlog')}
-        className={`nav-tab flex items-center gap-2 ${activeTab === 'warlog' ? 'active' : ''}`}
+        onClick={() => onTabChange('riverrace')}
+        className={`nav-tab flex items-center gap-2 ${activeTab === 'riverrace' ? 'active' : ''}`}
       >
-        <Swords className="w-4 h-4" />
-        War Logs
+        <Ship className="w-4 h-4" />
+        River Race
       </button>
     </nav>
   );

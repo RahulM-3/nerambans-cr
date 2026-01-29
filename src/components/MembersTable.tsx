@@ -5,6 +5,7 @@ import { SortArrow } from './SortArrow';
 import { FilterInput } from './FilterInput';
 import { RoleFilter } from './RoleFilter';
 import { formatLastSeen, getLastSeenEpoch } from '@/utils/dateUtils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface MembersTableProps {
   members: ClanMember[];
@@ -261,7 +262,14 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
           {filteredAndSortedMembers.map((member) => (
             <tr key={member.tag}>
               <td className={`font-medium ${getCellChangeClass(member, 'name')}`}>
-                {member.name}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="cursor-help">{member.name}</span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-mono text-xs">{member.tag}</p>
+                  </TooltipContent>
+                </Tooltip>
               </td>
               <td className={getCellChangeClass(member, 'role')}>
                 <RoleBadge role={member.role} />
@@ -279,7 +287,7 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
                 {member.donationsReceived}
               </td>
               <td className={`text-right tabular-nums ${getCellChangeClass(member, 'clanChestPoints')}`}>
-                {member.clanChestPoints}
+                {member.clanChestPoints ?? 0}
               </td>
               <td className={`text-muted-foreground text-sm ${getCellChangeClass(member, 'lastSeen')}`}>
                 {formatLastSeen(member.lastSeen)}
