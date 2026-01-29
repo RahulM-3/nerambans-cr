@@ -1,17 +1,41 @@
+// Clan Member Types
+export interface Arena {
+  id: number;
+  name: string;
+  rawName: string;
+}
+
 export interface ClanMember {
   tag: string;
   name: string;
   role: 'leader' | 'coLeader' | 'elder' | 'member';
+  clanChestPoints: number;
+  arena: Arena;
+  lastSeenEpoch: number;
   expLevel: number;
   trophies: number;
   clanRank: number;
   previousClanRank: number;
   donations: number;
   donationsReceived: number;
-  clanChestPoints?: number;
-  lastSeen: string | number;
 }
 
+export interface ClanMemberDelta {
+  tag: string;
+  name: string;
+  trophiesDelta: number;
+  donationsDelta: number;
+  donationsReceivedDelta: number;
+}
+
+export interface ClanMemberDeltasFile {
+  _meta: {
+    lastReset: string;
+  };
+  deltas: ClanMemberDelta[];
+}
+
+// River Race Types
 export interface RiverRaceParticipant {
   tag: string;
   name: string;
@@ -25,37 +49,86 @@ export interface RiverRaceParticipant {
 export interface RiverRaceClan {
   tag: string;
   name: string;
-  wins: number;
-  battlesPlayed: number;
-  clanScore: number;
-  crowns: number;
+  badgeId: number;
+  fame: number;
+  repairPoints: number;
   participants: RiverRaceParticipant[];
+  periodPoints?: number;
+  clanScore?: number;
+  finishTime?: string | null;
 }
 
-export interface RiverRaceDelta {
+export interface RiverRaceData {
+  raceId: string;
+  state: string;
+  sectionIndex: number;
+  periodIndex: number;
+  periodType: string;
+  collectionEndTime: string | null;
+  warEndTime: string | null;
+  clan: RiverRaceClan;
+  allClans: RiverRaceClan[];
+}
+
+// River Race Delta Types
+export interface RiverRaceParticipantDelta {
   tag: string;
   name: string;
-  winsDelta: number;
-  battlesPlayedDelta: number;
-  clanScoreDelta: number;
-  timestamp: number;
+  fameDelta: number;
+  repairPointsDelta: number;
+  boatAttacksDelta: number;
+  decksUsedDelta: number;
+  decksUsedTodayDelta: number;
 }
 
+export interface RiverRaceDeltasFile {
+  _meta: {
+    raceId: string;
+  };
+  deltas: RiverRaceParticipantDelta[];
+}
+
+// River Race Log Types
+export interface RiverRaceLogClan {
+  tag: string;
+  name: string;
+  badgeId: number;
+  fame: number;
+  repairPoints: number;
+  finishTime?: string;
+  participants: RiverRaceParticipant[];
+  periodPoints?: number;
+  clanScore?: number;
+}
+
+export interface RiverRaceLogStanding {
+  rank: number;
+  trophyChange: number;
+  clan: RiverRaceLogClan;
+}
+
+export interface RiverRaceLogEntry {
+  seasonId: number;
+  sectionIndex: number;
+  createdDate: string;
+  standings: RiverRaceLogStanding[];
+}
+
+export interface RiverRaceLogFile {
+  items: RiverRaceLogEntry[];
+}
+
+// Updates file type
 export interface UpdatesFile {
-  updated: boolean;
-  files: string[];
+  updatedFiles: string[];
   timestamp: number;
 }
 
+// Sort and Filter types
 export type SortDirection = 'asc' | 'desc' | null;
 
 export interface SortConfig {
   key: keyof ClanMember | null;
-  direction: SortDirection;
-}
-
-export interface RiverRaceSortConfig {
-  key: keyof RiverRaceClan | null;
   direction: SortDirection;
 }
 
@@ -65,16 +138,7 @@ export interface FilterConfig {
   trophies: string;
   donations: string;
   donationsReceived: string;
-  clanChestPoints: string;
-  lastSeen: string;
-}
-
-export interface RiverRaceFilterConfig {
-  name: string;
-  clanScore: string;
-  wins: string;
-  battlesPlayed: string;
-  crowns: string;
+  arena: string;
 }
 
 export const ROLE_HIERARCHY: Record<string, number> = {

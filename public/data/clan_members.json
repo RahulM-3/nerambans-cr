@@ -9,13 +9,13 @@
       "name": "Summit of Heroes",
       "rawName": "Arena_L14"
     },
-    "lastSeenEpoch": 1769676915,
+    "lastSeenEpoch": 1769682418,
     "expLevel": 76,
-    "trophies": 11893,
+    "trophies": 11921,
     "clanRank": 1,
     "previousClanRank": 0,
     "donations": 108,
-    "donationsReceived": 96
+    "donationsReceived": 104
   },
   {
     "tag": "#VGVUG09CQ",
@@ -27,13 +27,13 @@
       "name": "Summit of Heroes",
       "rawName": "Arena_L14"
     },
-    "lastSeenEpoch": 1769680476,
+    "lastSeenEpoch": 1769681639,
     "expLevel": 71,
     "trophies": 11595,
     "clanRank": 2,
     "previousClanRank": 0,
-    "donations": 58,
-    "donationsReceived": 80
+    "donations": 66,
+    "donationsReceived": 91
   },
   {
     "tag": "#2U02RCUJP",
@@ -54,6 +54,24 @@
     "donationsReceived": 80
   },
   {
+    "tag": "#9PYYLUQ9Y",
+    "name": "Gixips\u2661\ufe0e",
+    "role": "member",
+    "clanChestPoints": 0,
+    "arena": {
+      "id": 54000130,
+      "name": "Royal Road",
+      "rawName": "Arena_L12"
+    },
+    "lastSeenEpoch": 1769680433,
+    "expLevel": 66,
+    "trophies": 10862,
+    "clanRank": 4,
+    "previousClanRank": 0,
+    "donations": 40,
+    "donationsReceived": 70
+  },
+  {
     "tag": "#YYVQ2URC9",
     "name": "Queeny*j",
     "role": "member",
@@ -66,28 +84,10 @@
     "lastSeenEpoch": 1769645768,
     "expLevel": 63,
     "trophies": 10837,
-    "clanRank": 4,
+    "clanRank": 5,
     "previousClanRank": 0,
     "donations": 0,
     "donationsReceived": 40
-  },
-  {
-    "tag": "#9PYYLUQ9Y",
-    "name": "Gixips\u2661\ufe0e",
-    "role": "member",
-    "clanChestPoints": 0,
-    "arena": {
-      "id": 54000130,
-      "name": "Royal Road",
-      "rawName": "Arena_L12"
-    },
-    "lastSeenEpoch": 1769680433,
-    "expLevel": 66,
-    "trophies": 10804,
-    "clanRank": 5,
-    "previousClanRank": 0,
-    "donations": 40,
-    "donationsReceived": 60
   },
   {
     "tag": "#2GP02PU00",
@@ -261,9 +261,9 @@
       "name": "Lumberlove Cabin",
       "rawName": "Arena_L11"
     },
-    "lastSeenEpoch": 1769662315,
+    "lastSeenEpoch": 1769684086,
     "expLevel": 53,
-    "trophies": 10093,
+    "trophies": 10153,
     "clanRank": 15,
     "previousClanRank": 0,
     "donations": 7,
@@ -279,13 +279,13 @@
       "name": "Lumberlove Cabin",
       "rawName": "Arena_L11"
     },
-    "lastSeenEpoch": 1769676150,
+    "lastSeenEpoch": 1769681600,
     "expLevel": 50,
     "trophies": 10024,
     "clanRank": 16,
     "previousClanRank": 3,
-    "donations": 509,
-    "donationsReceived": 176
+    "donations": 535,
+    "donationsReceived": 184
   },
   {
     "tag": "#8Q8P9C0RJ",
@@ -405,7 +405,7 @@
       "name": "PANCAKES!",
       "rawName": "Arena_L8"
     },
-    "lastSeenEpoch": 1769680859,
+    "lastSeenEpoch": 1769683934,
     "expLevel": 40,
     "trophies": 8599,
     "clanRank": 23,
@@ -468,24 +468,6 @@
     "donationsReceived": 0
   },
   {
-    "tag": "#GPUPV8VLR",
-    "name": "CAMEO",
-    "role": "member",
-    "clanChestPoints": 0,
-    "arena": {
-      "id": 54000017,
-      "name": "Boot Camp",
-      "rawName": "Arena_L6"
-    },
-    "lastSeenEpoch": 1769620533,
-    "expLevel": 34,
-    "trophies": 7875,
-    "clanRank": 27,
-    "previousClanRank": 0,
-    "donations": 0,
-    "donationsReceived": 0
-  },
-  {
     "tag": "#2RJYGP8VQ",
     "name": "M\u00e2\u00f1\u00f6 R\u00e4\u00f1j\u00e0\u00e0\u00f1",
     "role": "member",
@@ -498,7 +480,7 @@
     "lastSeenEpoch": 1769655558,
     "expLevel": 38,
     "trophies": 7826,
-    "clanRank": 28,
+    "clanRank": 27,
     "previousClanRank": 0,
     "donations": 0,
     "donationsReceived": 0
@@ -516,6 +498,24 @@
     "lastSeenEpoch": 1769628719,
     "expLevel": 38,
     "trophies": 7817,
+    "clanRank": 28,
+    "previousClanRank": 0,
+    "donations": 0,
+    "donationsReceived": 0
+  },
+  {
+    "tag": "#GPUPV8VLR",
+    "name": "CAMEO",
+    "role": "member",
+    "clanChestPoints": 0,
+    "arena": {
+      "id": 54000017,
+      "name": "Boot Camp",
+      "rawName": "Arena_L6"
+    },
+    "lastSeenEpoch": 1769683045,
+    "expLevel": 34,
+    "trophies": 7755,
     "clanRank": 29,
     "previousClanRank": 0,
     "donations": 0,
@@ -631,7 +631,7 @@
   },
   {
     "tag": "#UVYRCLYUJ",
-    "name": "lusu kudhi",
+    "name": "Nico_Robin007",
     "role": "member",
     "clanChestPoints": 0,
     "arena": {
@@ -639,12 +639,12 @@
       "name": "Royal Crypt",
       "rawName": "Arena_L3"
     },
-    "lastSeenEpoch": 1769680818,
+    "lastSeenEpoch": 1769682695,
     "expLevel": 33,
-    "trophies": 6306,
+    "trophies": 6272,
     "clanRank": 36,
     "previousClanRank": 0,
-    "donations": 10,
+    "donations": 13,
     "donationsReceived": 0
   },
   {
@@ -731,7 +731,7 @@
     },
     "lastSeenEpoch": 1769680628,
     "expLevel": 24,
-    "trophies": 4421,
+    "trophies": 4390,
     "clanRank": 41,
     "previousClanRank": 0,
     "donations": 0,
@@ -747,7 +747,7 @@
       "name": "Hog Mountain",
       "rawName": "Arena_L"
     },
-    "lastSeenEpoch": 1769663243,
+    "lastSeenEpoch": 1769684446,
     "expLevel": 24,
     "trophies": 3099,
     "clanRank": 42,

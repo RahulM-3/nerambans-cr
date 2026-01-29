@@ -1,17 +1,17 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ClanMember, SortConfig, FilterConfig, ROLE_HIERARCHY } from '@/types/clan';
+import { ClanMember, ClanMemberDelta, SortConfig, FilterConfig, ROLE_HIERARCHY } from '@/types/clan';
 import { RoleBadge } from './RoleBadge';
 import { SortArrow } from './SortArrow';
 import { FilterInput } from './FilterInput';
 import { RoleFilter } from './RoleFilter';
-import { formatLastSeen, getLastSeenEpoch } from '@/utils/dateUtils';
+import { formatLastSeen, getRelativeTime } from '@/utils/dateUtils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { DeltaIndicator } from './DeltaIndicator';
 
 interface MembersTableProps {
   members: ClanMember[];
-  previousMembers: Map<string, ClanMember>;
-  changedFields: Map<string, Set<keyof ClanMember>>;
+  memberDeltas: Map<string, ClanMemberDelta>;
 }
 
 const initialFilters: FilterConfig = {
@@ -20,11 +20,10 @@ const initialFilters: FilterConfig = {
   trophies: '',
   donations: '',
   donationsReceived: '',
-  clanChestPoints: '',
-  lastSeen: '',
+  arena: '',
 };
 
-export function MembersTable({ members, previousMembers, changedFields }: MembersTableProps) {
+export function MembersTable({ members, memberDeltas }: MembersTableProps) {
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'clanRank', direction: 'asc' });
   const [filters, setFilters] = useState<FilterConfig>(initialFilters);
   
@@ -63,27 +62,6 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const getCellChangeClass = (member: ClanMember, field: keyof ClanMember): string => {
-    const changes = changedFields.get(member.tag);
-    if (!changes?.has(field)) return '';
-    
-    const prev = previousMembers.get(member.tag);
-    if (!prev) return '';
-    
-    const prevValue = prev[field];
-    const currentValue = member[field];
-    
-    if (typeof prevValue === 'number' && typeof currentValue === 'number') {
-      if (field === 'clanRank') {
-        // Lower rank number is better
-        return currentValue < prevValue ? 'flash-increase' : 'flash-decrease';
-      }
-      return currentValue > prevValue ? 'flash-increase' : 'flash-decrease';
-    }
-    
-    return '';
-  };
-
   const filteredAndSortedMembers = useMemo(() => {
     let result = [...members];
 
@@ -114,17 +92,10 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
         result = result.filter((m) => m.donationsReceived >= minReceived);
       }
     }
-    if (filters.clanChestPoints) {
-      const minChest = parseInt(filters.clanChestPoints, 10);
-      if (!isNaN(minChest)) {
-        result = result.filter((m) => m.clanChestPoints >= minChest);
-      }
-    }
-    if (filters.lastSeen) {
-      result = result.filter((m) => {
-        const formatted = formatLastSeen(m.lastSeen);
-        return formatted.toLowerCase().includes(filters.lastSeen.toLowerCase());
-      });
+    if (filters.arena) {
+      result = result.filter((m) =>
+        m.arena.name.toLowerCase().includes(filters.arena.toLowerCase())
+      );
     }
 
     // Apply sorting
@@ -139,11 +110,20 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
           return sortConfig.direction === 'asc' ? bRank - aRank : aRank - bRank;
         }
         
-        // Special handling for lastSeen - use epoch for proper sorting
-        if (key === 'lastSeen') {
-          const aEpoch = getLastSeenEpoch(a.lastSeen);
-          const bEpoch = getLastSeenEpoch(b.lastSeen);
-          return sortConfig.direction === 'asc' ? aEpoch - bEpoch : bEpoch - aEpoch;
+        // Special handling for lastSeenEpoch
+        if (key === 'lastSeenEpoch') {
+          return sortConfig.direction === 'asc' 
+            ? a.lastSeenEpoch - b.lastSeenEpoch 
+            : b.lastSeenEpoch - a.lastSeenEpoch;
+        }
+
+        // Special handling for arena
+        if (key === 'arena') {
+          const aArena = a.arena.name.toLowerCase();
+          const bArena = b.arena.name.toLowerCase();
+          return sortConfig.direction === 'asc' 
+            ? aArena.localeCompare(bArena) 
+            : bArena.localeCompare(aArena);
         }
 
         const aVal = a[key];
@@ -167,16 +147,16 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
   }, [members, filters, sortConfig]);
 
   const columns: { key: keyof ClanMember; label: string; type: 'text' | 'number' }[] = [
+    { key: 'clanRank', label: '#', type: 'number' },
     { key: 'name', label: 'Name', type: 'text' },
     { key: 'role', label: 'Role', type: 'text' },
     { key: 'trophies', label: 'Trophies', type: 'number' },
-    { key: 'clanRank', label: 'Rank', type: 'number' },
-    { key: 'donations', label: 'Donations', type: 'number' },
+    { key: 'expLevel', label: 'Lvl', type: 'number' },
+    { key: 'donations', label: 'Donated', type: 'number' },
     { key: 'donationsReceived', label: 'Received', type: 'number' },
-    { key: 'clanChestPoints', label: 'Chest Pts', type: 'number' },
-    { key: 'lastSeen', label: 'Last Seen', type: 'text' },
+    { key: 'arena', label: 'Arena', type: 'text' },
+    { key: 'lastSeenEpoch', label: 'Last Seen', type: 'number' },
   ];
-
 
   return (
     <div ref={scrollRef} className="overflow-auto max-h-[calc(100vh-200px)] rounded-lg border border-border">
@@ -200,6 +180,7 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
             ))}
           </tr>
           <tr className="bg-card">
+            <th className="!py-1 !cursor-default">{/* No filter for rank */}</th>
             <th className="!py-1 !cursor-default">
               <FilterInput
                 value={filters.name}
@@ -222,9 +203,7 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
                 type="number"
               />
             </th>
-            <th className="!py-1 !cursor-default">
-              {/* No filter for rank */}
-            </th>
+            <th className="!py-1 !cursor-default">{/* No filter for level */}</th>
             <th className="!py-1 !cursor-default">
               <FilterInput
                 value={filters.donations}
@@ -243,69 +222,87 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
             </th>
             <th className="!py-1 !cursor-default">
               <FilterInput
-                value={filters.clanChestPoints}
-                onChange={(value) => updateFilter('clanChestPoints', value)}
-                placeholder="≥"
-                type="number"
-              />
-            </th>
-            <th className="!py-1 !cursor-default">
-              <FilterInput
-                value={filters.lastSeen}
-                onChange={(value) => updateFilter('lastSeen', value)}
+                value={filters.arena}
+                onChange={(value) => updateFilter('arena', value)}
                 placeholder="Filter..."
                 type="text"
               />
             </th>
+            <th className="!py-1 !cursor-default">{/* No filter for last seen */}</th>
           </tr>
         </thead>
         <AnimatePresence mode="popLayout">
-          {filteredAndSortedMembers.map((member) => (
-            <motion.tr
-              key={member.tag}
-              layout
-              initial={false}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{
-                layout: { type: "spring", stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 }
-              }}
-              style={{ position: 'relative' }}
-            >
-              <td className={`font-medium ${getCellChangeClass(member, 'name')}`}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="cursor-help">{member.name}</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="font-mono text-xs">{member.tag}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </td>
-              <td className={getCellChangeClass(member, 'role')}>
-                <RoleBadge role={member.role} />
-              </td>
-              <td className={`text-right tabular-nums ${getCellChangeClass(member, 'trophies')}`}>
-                {member.trophies.toLocaleString()}
-              </td>
-              <td className={`text-center ${getCellChangeClass(member, 'clanRank')}`}>
-                #{member.clanRank}
-              </td>
-              <td className={`text-right tabular-nums ${getCellChangeClass(member, 'donations')}`}>
-                {member.donations}
-              </td>
-              <td className={`text-right tabular-nums ${getCellChangeClass(member, 'donationsReceived')}`}>
-                {member.donationsReceived}
-              </td>
-              <td className={`text-right tabular-nums ${getCellChangeClass(member, 'clanChestPoints')}`}>
-                {member.clanChestPoints ?? 0}
-              </td>
-              <td className={`text-muted-foreground text-sm ${getCellChangeClass(member, 'lastSeen')}`}>
-                {formatLastSeen(member.lastSeen)}
-              </td>
-            </motion.tr>
-          ))}
+          {filteredAndSortedMembers.map((member) => {
+            const delta = memberDeltas.get(member.tag);
+            return (
+              <motion.tr
+                key={member.tag}
+                layout
+                initial={false}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  layout: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.2 }
+                }}
+                style={{ position: 'relative' }}
+              >
+                <td className="text-center text-muted-foreground">
+                  #{member.clanRank}
+                </td>
+                <td className="font-medium">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="cursor-help">{member.name}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="font-mono text-xs">{member.tag}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </td>
+                <td>
+                  <RoleBadge role={member.role} />
+                </td>
+                <td className="text-right tabular-nums">
+                  <span>{member.trophies.toLocaleString()}</span>
+                  {delta && <DeltaIndicator value={delta.trophiesDelta} />}
+                </td>
+                <td className="text-center tabular-nums text-muted-foreground">
+                  {member.expLevel}
+                </td>
+                <td className="text-right tabular-nums">
+                  <span>{member.donations}</span>
+                  {delta && <DeltaIndicator value={delta.donationsDelta} />}
+                </td>
+                <td className="text-right tabular-nums">
+                  <span>{member.donationsReceived}</span>
+                  {delta && <DeltaIndicator value={delta.donationsReceivedDelta} />}
+                </td>
+                <td className="text-sm">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="cursor-help truncate max-w-[120px] inline-block">
+                        {member.arena.name}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">{member.arena.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </td>
+                <td className="text-muted-foreground text-sm">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="cursor-help">{getRelativeTime(member.lastSeenEpoch)}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">{formatLastSeen(member.lastSeenEpoch)}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </td>
+              </motion.tr>
+            );
+          })}
         </AnimatePresence>
       </table>
       {filteredAndSortedMembers.length === 0 && (

@@ -10,7 +10,7 @@
     "tag": "#RG2VL88G",
     "name": "NERAMBANS",
     "badgeId": 16000002,
-    "fame": 0,
+    "fame": 1500,
     "repairPoints": 0,
     "participants": [
       {
@@ -356,15 +356,6 @@
         "decksUsedToday": 0
       },
       {
-        "tag": "#JYU9VLUUY",
-        "name": "Virumaandi",
-        "fame": 0,
-        "repairPoints": 0,
-        "boatAttacks": 0,
-        "decksUsed": 0,
-        "decksUsedToday": 0
-      },
-      {
         "tag": "#8PR8PUJJJ",
         "name": "petta parak",
         "fame": 0,
@@ -446,15 +437,6 @@
         "decksUsedToday": 0
       },
       {
-        "tag": "#UVYRCLYUJ",
-        "name": "lusu kudhi",
-        "fame": 0,
-        "repairPoints": 0,
-        "boatAttacks": 0,
-        "decksUsed": 0,
-        "decksUsedToday": 0
-      },
-      {
         "tag": "#R09QLQ22V",
         "name": "Maddy",
         "fame": 0,
@@ -511,15 +493,6 @@
       {
         "tag": "#JC2PYU2P2",
         "name": "Vignesh dhoni",
-        "fame": 0,
-        "repairPoints": 0,
-        "boatAttacks": 0,
-        "decksUsed": 0,
-        "decksUsedToday": 0
-      },
-      {
-        "tag": "#VGVUG09CQ",
-        "name": "sree",
         "fame": 0,
         "repairPoints": 0,
         "boatAttacks": 0,
@@ -597,6 +570,33 @@
         "boatAttacks": 0,
         "decksUsed": 0,
         "decksUsedToday": 0
+      },
+      {
+        "tag": "#UVYRCLYUJ",
+        "name": "lusu kudhi",
+        "fame": 300,
+        "repairPoints": 0,
+        "boatAttacks": 0,
+        "decksUsed": 2,
+        "decksUsedToday": 2
+      },
+      {
+        "tag": "#JYU9VLUUY",
+        "name": "Virumaandi",
+        "fame": 500,
+        "repairPoints": 0,
+        "boatAttacks": 0,
+        "decksUsed": 4,
+        "decksUsedToday": 4
+      },
+      {
+        "tag": "#VGVUG09CQ",
+        "name": "sree",
+        "fame": 700,
+        "repairPoints": 0,
+        "boatAttacks": 0,
+        "decksUsed": 4,
+        "decksUsedToday": 4
       }
     ]
   },
@@ -951,7 +951,7 @@
       "name": "montoya montoya",
       "badgeId": 16000078,
       "clanScore": 431,
-      "fame": 0,
+      "fame": 200,
       "repairPoints": 0,
       "finishTime": null,
       "periodPoints": 0,
@@ -1103,11 +1103,11 @@
         {
           "tag": "#CG80GC2RJ",
           "name": "enzo",
-          "fame": 0,
+          "fame": 200,
           "repairPoints": 0,
           "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
+          "decksUsed": 2,
+          "decksUsedToday": 2
         }
       ]
     },
@@ -1371,7 +1371,7 @@
       "name": "NERAMBANS",
       "badgeId": 16000002,
       "clanScore": 493,
-      "fame": 0,
+      "fame": 1500,
       "repairPoints": 0,
       "finishTime": null,
       "periodPoints": 0,
@@ -1719,15 +1719,6 @@
           "decksUsedToday": 0
         },
         {
-          "tag": "#JYU9VLUUY",
-          "name": "Virumaandi",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
           "tag": "#8PR8PUJJJ",
           "name": "petta parak",
           "fame": 0,
@@ -1809,15 +1800,6 @@
           "decksUsedToday": 0
         },
         {
-          "tag": "#UVYRCLYUJ",
-          "name": "lusu kudhi",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
           "tag": "#R09QLQ22V",
           "name": "Maddy",
           "fame": 0,
@@ -1874,15 +1856,6 @@
         {
           "tag": "#JC2PYU2P2",
           "name": "Vignesh dhoni",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
-          "tag": "#VGVUG09CQ",
-          "name": "sree",
           "fame": 0,
           "repairPoints": 0,
           "boatAttacks": 0,
@@ -1960,6 +1933,33 @@
           "boatAttacks": 0,
           "decksUsed": 0,
           "decksUsedToday": 0
+        },
+        {
+          "tag": "#UVYRCLYUJ",
+          "name": "lusu kudhi",
+          "fame": 300,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 2,
+          "decksUsedToday": 2
+        },
+        {
+          "tag": "#JYU9VLUUY",
+          "name": "Virumaandi",
+          "fame": 500,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 4,
+          "decksUsedToday": 4
+        },
+        {
+          "tag": "#VGVUG09CQ",
+          "name": "sree",
+          "fame": 700,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 4,
+          "decksUsedToday": 4
         }
       ]
     },

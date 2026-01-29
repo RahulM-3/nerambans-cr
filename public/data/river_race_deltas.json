@@ -346,15 +346,6 @@
       "decksUsedTodayDelta": 0
     },
     {
-      "tag": "#JYU9VLUUY",
-      "name": "Virumaandi",
-      "fameDelta": 0,
-      "repairPointsDelta": 0,
-      "boatAttacksDelta": 0,
-      "decksUsedDelta": 0,
-      "decksUsedTodayDelta": 0
-    },
-    {
       "tag": "#8PR8PUJJJ",
       "name": "petta parak",
       "fameDelta": 0,
@@ -436,15 +427,6 @@
       "decksUsedTodayDelta": 0
     },
     {
-      "tag": "#UVYRCLYUJ",
-      "name": "lusu kudhi",
-      "fameDelta": 0,
-      "repairPointsDelta": 0,
-      "boatAttacksDelta": 0,
-      "decksUsedDelta": 0,
-      "decksUsedTodayDelta": 0
-    },
-    {
       "tag": "#R09QLQ22V",
       "name": "Maddy",
       "fameDelta": 0,
@@ -501,15 +483,6 @@
     {
       "tag": "#JC2PYU2P2",
       "name": "Vignesh dhoni",
-      "fameDelta": 0,
-      "repairPointsDelta": 0,
-      "boatAttacksDelta": 0,
-      "decksUsedDelta": 0,
-      "decksUsedTodayDelta": 0
-    },
-    {
-      "tag": "#VGVUG09CQ",
-      "name": "sree",
       "fameDelta": 0,
       "repairPointsDelta": 0,
       "boatAttacksDelta": 0,
@@ -582,6 +555,33 @@
     {
       "tag": "#V2QJ29R2U",
       "name": "sarveshvinci",
+      "fameDelta": 0,
+      "repairPointsDelta": 0,
+      "boatAttacksDelta": 0,
+      "decksUsedDelta": 0,
+      "decksUsedTodayDelta": 0
+    },
+    {
+      "tag": "#UVYRCLYUJ",
+      "name": "lusu kudhi",
+      "fameDelta": 0,
+      "repairPointsDelta": 0,
+      "boatAttacksDelta": 0,
+      "decksUsedDelta": 0,
+      "decksUsedTodayDelta": 0
+    },
+    {
+      "tag": "#JYU9VLUUY",
+      "name": "Virumaandi",
+      "fameDelta": 0,
+      "repairPointsDelta": 0,
+      "boatAttacksDelta": 0,
+      "decksUsedDelta": 0,
+      "decksUsedTodayDelta": 0
+    },
+    {
+      "tag": "#VGVUG09CQ",
+      "name": "sree",
       "fameDelta": 0,
       "repairPointsDelta": 0,
       "boatAttacksDelta": 0,

@@ -3,12 +3,22 @@ import { useClanData } from '@/hooks/useClanData';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { Navigation } from '@/components/Navigation';
 import { MembersTable } from '@/components/MembersTable';
-import { RiverRaceTable } from '@/components/RiverRaceTable';
+import { RiverRaceSection } from '@/components/RiverRaceSection';
+import { RiverRaceLogSection } from '@/components/RiverRaceLogSection';
 import { Loader2 } from 'lucide-react';
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<'members' | 'riverrace'>('members');
-  const { members, riverRace, riverRaceDeltas, previousMembers, changedFields, isLoading, error, lastUpdated } = useClanData();
+  const [activeTab, setActiveTab] = useState<'members' | 'riverrace' | 'history'>('members');
+  const { 
+    members, 
+    memberDeltas, 
+    riverRace, 
+    riverRaceDeltas, 
+    riverRaceLog, 
+    isLoading, 
+    error, 
+    lastUpdated 
+  } = useClanData();
 
   const topTrophies = members.length > 0 ? Math.max(...members.map(m => m.trophies)) : 0;
 
@@ -41,20 +51,27 @@ const Index = () => {
         topTrophies={topTrophies}
         lastUpdated={lastUpdated}
         isLoading={isLoading}
+        riverRace={riverRace}
       />
       
       <div className="px-4 md:px-6 py-4">
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
         
         <div className="mt-4">
-          {activeTab === 'members' ? (
+          {activeTab === 'members' && (
             <MembersTable
               members={members}
-              previousMembers={previousMembers}
-              changedFields={changedFields}
+              memberDeltas={memberDeltas}
             />
-          ) : (
-            <RiverRaceTable riverRace={riverRace} deltas={riverRaceDeltas} />
+          )}
+          {activeTab === 'riverrace' && riverRace && (
+            <RiverRaceSection 
+              riverRace={riverRace} 
+              deltas={riverRaceDeltas} 
+            />
+          )}
+          {activeTab === 'history' && riverRaceLog && (
+            <RiverRaceLogSection log={riverRaceLog} />
           )}
         </div>
       </div>

@@ -1,14 +1,15 @@
-import { RefreshCw, Clock, Users, Trophy } from 'lucide-react';
-import { ClanMember } from '@/types/clan';
+import { RefreshCw, Clock, Users, Trophy, Ship, Swords } from 'lucide-react';
+import { RiverRaceData } from '@/types/clan';
 
 interface DashboardHeaderProps {
   memberCount: number;
   topTrophies: number;
   lastUpdated: Date | null;
   isLoading: boolean;
+  riverRace?: RiverRaceData | null;
 }
 
-export function DashboardHeader({ memberCount, topTrophies, lastUpdated, isLoading }: DashboardHeaderProps) {
+export function DashboardHeader({ memberCount, topTrophies, lastUpdated, isLoading, riverRace }: DashboardHeaderProps) {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
@@ -19,33 +20,49 @@ export function DashboardHeader({ memberCount, topTrophies, lastUpdated, isLoadi
 
   return (
     <header className="bg-card border-b border-border px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient-gold glow-gold">
-            Clan Dashboard
-          </h1>
-          <div className="hidden md:flex items-center gap-4 ml-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Users className="w-4 h-4" />
-              <span>{memberCount} Members</span>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient-gold glow-gold">
+              NERAMBANS Dashboard
+            </h1>
+          </div>
+          
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <div className={`flex items-center gap-2 ${isLoading ? 'animate-pulse' : ''}`}>
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Auto-refresh</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Trophy className="w-4 h-4 text-primary" />
-              <span>Top: {topTrophies.toLocaleString()}</span>
-            </div>
+            {lastUpdated && (
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span className="tabular-nums">{formatTime(lastUpdated)}</span>
+              </div>
+            )}
           </div>
         </div>
-        
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <div className={`flex items-center gap-2 ${isLoading ? 'animate-pulse' : ''}`}>
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Auto-refresh</span>
+
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-lg">
+            <Users className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">{memberCount} Members</span>
           </div>
-          {lastUpdated && (
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span className="tabular-nums">{formatTime(lastUpdated)}</span>
-            </div>
+          <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-lg">
+            <Trophy className="w-4 h-4 text-yellow-500" />
+            <span className="text-sm font-medium">Top: {topTrophies.toLocaleString()}</span>
+          </div>
+          {riverRace && (
+            <>
+              <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-lg">
+                <Ship className="w-4 h-4 text-blue-500" />
+                <span className="text-sm font-medium">{riverRace.periodType}</span>
+                <span className="text-xs text-muted-foreground">Period {riverRace.periodIndex}</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-lg">
+                <Swords className="w-4 h-4 text-orange-500" />
+                <span className="text-sm font-medium">{riverRace.clan.fame.toLocaleString()} Fame</span>
+              </div>
+            </>
           )}
         </div>
       </div>

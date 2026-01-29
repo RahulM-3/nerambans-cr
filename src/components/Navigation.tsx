@@ -1,8 +1,8 @@
-import { Users, Ship } from 'lucide-react';
+import { Users, Ship, History } from 'lucide-react';
 
 interface NavigationProps {
-  activeTab: 'members' | 'riverrace';
-  onTabChange: (tab: 'members' | 'riverrace') => void;
+  activeTab: 'members' | 'riverrace' | 'history';
+  onTabChange: (tab: 'members' | 'riverrace' | 'history') => void;
 }
 
 export function Navigation({ activeTab, onTabChange }: NavigationProps) {
@@ -21,6 +21,13 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
       >
         <Ship className="w-4 h-4" />
         River Race
+      </button>
+      <button
+        onClick={() => onTabChange('history')}
+        className={`nav-tab flex items-center gap-2 ${activeTab === 'history' ? 'active' : ''}`}
+      >
+        <History className="w-4 h-4" />
+        Race History
       </button>
     </nav>
   );
