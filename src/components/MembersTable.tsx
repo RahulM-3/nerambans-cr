@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ClanMember, SortConfig, FilterConfig, ROLE_HIERARCHY } from '@/types/clan';
 import { RoleBadge } from './RoleBadge';
 import { SortArrow } from './SortArrow';
@@ -258,9 +259,20 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
             </th>
           </tr>
         </thead>
-        <tbody>
+        <AnimatePresence mode="popLayout">
           {filteredAndSortedMembers.map((member) => (
-            <tr key={member.tag}>
+            <motion.tr
+              key={member.tag}
+              layout
+              initial={false}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                layout: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 }
+              }}
+              style={{ position: 'relative' }}
+            >
               <td className={`font-medium ${getCellChangeClass(member, 'name')}`}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -292,9 +304,9 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
               <td className={`text-muted-foreground text-sm ${getCellChangeClass(member, 'lastSeen')}`}>
                 {formatLastSeen(member.lastSeen)}
               </td>
-            </tr>
+            </motion.tr>
           ))}
-        </tbody>
+        </AnimatePresence>
       </table>
       {filteredAndSortedMembers.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RiverRaceClan, RiverRaceDelta, RiverRaceSortConfig, RiverRaceFilterConfig } from '@/types/clan';
 import { SortArrow } from './SortArrow';
 import { FilterInput } from './FilterInput';
@@ -229,35 +230,54 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
             <th className="!py-1 !cursor-default"></th>
           </tr>
         </thead>
-        <tbody>
+        <AnimatePresence mode="popLayout">
           {filteredAndSortedClans.map((clan) => (
-            <>
-              <tr key={clan.tag} className="cursor-pointer hover:bg-secondary/50" onClick={() => toggleExpand(clan.tag)}>
-                <td className="!px-2">
-                  {expandedClan === clan.tag ? (
-                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </td>
-                <td className="font-medium">{clan.name}</td>
-                <td className="text-right tabular-nums">{clan.clanScore.toLocaleString()}</td>
-                <td className="text-right tabular-nums">{clan.wins}</td>
-                <td className="text-right tabular-nums">{clan.battlesPlayed}</td>
-                <td className="text-right tabular-nums">{clan.crowns}</td>
-                <td className="text-center text-muted-foreground">{clan.participants.length}</td>
-                <td>{getDeltaDisplay(clan)}</td>
-              </tr>
-              {expandedClan === clan.tag && (
-                <tr key={`${clan.tag}-participants`}>
-                  <td colSpan={8} className="!p-0 bg-secondary/20">
-                    <RiverRaceParticipantsTable participants={clan.participants} />
-                  </td>
-                </tr>
-              )}
-            </>
+            <motion.tr
+              key={clan.tag}
+              layout
+              initial={false}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                layout: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 }
+              }}
+              className="cursor-pointer hover:bg-secondary/50"
+              onClick={() => toggleExpand(clan.tag)}
+              style={{ position: 'relative' }}
+            >
+              <td className="!px-2">
+                {expandedClan === clan.tag ? (
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                )}
+              </td>
+              <td className="font-medium">{clan.name}</td>
+              <td className="text-right tabular-nums">{clan.clanScore.toLocaleString()}</td>
+              <td className="text-right tabular-nums">{clan.wins}</td>
+              <td className="text-right tabular-nums">{clan.battlesPlayed}</td>
+              <td className="text-right tabular-nums">{clan.crowns}</td>
+              <td className="text-center text-muted-foreground">{clan.participants.length}</td>
+              <td>{getDeltaDisplay(clan)}</td>
+            </motion.tr>
           ))}
-        </tbody>
+          {filteredAndSortedClans.map((clan) => (
+            expandedClan === clan.tag && (
+              <motion.tr
+                key={`${clan.tag}-participants`}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              >
+                <td colSpan={8} className="!p-0 bg-secondary/20">
+                  <RiverRaceParticipantsTable participants={clan.participants} />
+                </td>
+              </motion.tr>
+            )
+          ))}
+        </AnimatePresence>
       </table>
       {filteredAndSortedClans.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">

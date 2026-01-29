@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RiverRaceParticipant } from '@/types/clan';
 import { SortArrow } from './SortArrow';
 import { FilterInput } from './FilterInput';
@@ -163,9 +164,21 @@ export function RiverRaceParticipantsTable({ participants }: RiverRaceParticipan
             <th className="!py-1 !cursor-default"></th>
           </tr>
         </thead>
-        <tbody>
+        <AnimatePresence mode="popLayout">
           {filteredAndSorted.map((p) => (
-            <tr key={p.tag} className="text-sm">
+            <motion.tr
+              key={p.tag}
+              layout
+              initial={false}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                layout: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 }
+              }}
+              className="text-sm"
+              style={{ position: 'relative' }}
+            >
               <td className="font-medium">
                 <TooltipProvider>
                   <Tooltip>
@@ -183,9 +196,9 @@ export function RiverRaceParticipantsTable({ participants }: RiverRaceParticipan
               <td className="text-right tabular-nums">{p.boatAttacks}</td>
               <td className="text-right tabular-nums">{p.decksUsed}</td>
               <td className="text-right tabular-nums text-muted-foreground">{p.decksUsedToday}</td>
-            </tr>
+            </motion.tr>
           ))}
-        </tbody>
+        </AnimatePresence>
       </table>
       {filteredAndSorted.length === 0 && (
         <div className="text-center py-4 text-muted-foreground text-sm">
