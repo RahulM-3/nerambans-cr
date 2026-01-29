@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, Fragment } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RiverRaceClan, RiverRaceDelta, RiverRaceSortConfig, RiverRaceFilterConfig } from '@/types/clan';
 import { SortArrow } from './SortArrow';
 import { FilterInput } from './FilterInput';
 import { RiverRaceParticipantsTable } from './RiverRaceParticipantsTable';
 import { ChevronDown, ChevronRight, Ship, TrendingUp } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface RiverRaceTableProps {
   riverRace: RiverRaceClan[];
@@ -162,15 +163,15 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
 
   return (
     <div ref={scrollRef} className="overflow-auto max-h-[calc(100vh-200px)] rounded-lg border border-border">
-      <table className="data-table">
+      <table className="data-table w-auto">
         <thead className="sticky top-0 z-10">
           <tr>
-            <th className="w-8"></th>
+            <th className="!w-6 !px-1"></th>
             {columns.map((col) => (
               <th
                 key={col.key}
                 onClick={() => handleSort(col.key)}
-                className="whitespace-nowrap"
+                className="whitespace-nowrap !px-2"
               >
                 <div className="flex items-center gap-1">
                   {col.label}
@@ -181,12 +182,12 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
                 </div>
               </th>
             ))}
-            <th>Participants</th>
-            <th>Progress</th>
+            <th className="!px-2">Participants</th>
+            <th className="!px-2">Progress</th>
           </tr>
           <tr className="bg-card">
-            <th className="!py-1 !cursor-default"></th>
-            <th className="!py-1 !cursor-default">
+            <th className="!py-1 !px-1 !cursor-default"></th>
+            <th className="!py-1 !px-2 !cursor-default">
               <FilterInput
                 value={filters.name}
                 onChange={(value) => updateFilter('name', value)}
@@ -194,7 +195,7 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
                 type="text"
               />
             </th>
-            <th className="!py-1 !cursor-default">
+            <th className="!py-1 !px-2 !cursor-default">
               <FilterInput
                 value={filters.clanScore}
                 onChange={(value) => updateFilter('clanScore', value)}
@@ -202,7 +203,7 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
                 type="number"
               />
             </th>
-            <th className="!py-1 !cursor-default">
+            <th className="!py-1 !px-2 !cursor-default">
               <FilterInput
                 value={filters.wins}
                 onChange={(value) => updateFilter('wins', value)}
@@ -210,7 +211,7 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
                 type="number"
               />
             </th>
-            <th className="!py-1 !cursor-default">
+            <th className="!py-1 !px-2 !cursor-default">
               <FilterInput
                 value={filters.battlesPlayed}
                 onChange={(value) => updateFilter('battlesPlayed', value)}
@@ -218,7 +219,7 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
                 type="number"
               />
             </th>
-            <th className="!py-1 !cursor-default">
+            <th className="!py-1 !px-2 !cursor-default">
               <FilterInput
                 value={filters.crowns}
                 onChange={(value) => updateFilter('crowns', value)}
@@ -226,58 +227,70 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
                 type="number"
               />
             </th>
-            <th className="!py-1 !cursor-default"></th>
-            <th className="!py-1 !cursor-default"></th>
+            <th className="!py-1 !px-2 !cursor-default"></th>
+            <th className="!py-1 !px-2 !cursor-default"></th>
           </tr>
         </thead>
-        <AnimatePresence mode="popLayout">
-          {filteredAndSortedClans.map((clan) => (
-            <motion.tr
-              key={clan.tag}
-              layout
-              initial={false}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{
-                layout: { type: "spring", stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 }
-              }}
-              className="cursor-pointer hover:bg-secondary/50"
-              onClick={() => toggleExpand(clan.tag)}
-              style={{ position: 'relative' }}
-            >
-              <td className="!px-2">
-                {expandedClan === clan.tag ? (
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        <tbody>
+          <AnimatePresence mode="popLayout">
+            {filteredAndSortedClans.map((clan) => (
+              <Fragment key={clan.tag}>
+                <motion.tr
+                  layout
+                  initial={false}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    layout: { type: "spring", stiffness: 300, damping: 30 },
+                    opacity: { duration: 0.2 }
+                  }}
+                  className="cursor-pointer hover:bg-secondary/50"
+                  onClick={() => toggleExpand(clan.tag)}
+                  style={{ position: 'relative' }}
+                >
+                  <td className="!px-1">
+                    {expandedClan === clan.tag ? (
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </td>
+                  <td className="font-medium !px-2">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-help">{clan.name}</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="font-mono text-xs">{clan.tag}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </td>
+                  <td className="text-right tabular-nums !px-2">{clan.clanScore.toLocaleString()}</td>
+                  <td className="text-right tabular-nums !px-2">{clan.wins}</td>
+                  <td className="text-right tabular-nums !px-2">{clan.battlesPlayed}</td>
+                  <td className="text-right tabular-nums !px-2">{clan.crowns}</td>
+                  <td className="text-center text-muted-foreground !px-2">{clan.participants.length}</td>
+                  <td className="!px-2">{getDeltaDisplay(clan)}</td>
+                </motion.tr>
+                {expandedClan === clan.tag && (
+                  <motion.tr
+                    key={`${clan.tag}-participants`}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  >
+                    <td colSpan={8} className="!p-0 bg-secondary/20">
+                      <RiverRaceParticipantsTable participants={clan.participants} />
+                    </td>
+                  </motion.tr>
                 )}
-              </td>
-              <td className="font-medium">{clan.name}</td>
-              <td className="text-right tabular-nums">{clan.clanScore.toLocaleString()}</td>
-              <td className="text-right tabular-nums">{clan.wins}</td>
-              <td className="text-right tabular-nums">{clan.battlesPlayed}</td>
-              <td className="text-right tabular-nums">{clan.crowns}</td>
-              <td className="text-center text-muted-foreground">{clan.participants.length}</td>
-              <td>{getDeltaDisplay(clan)}</td>
-            </motion.tr>
-          ))}
-          {filteredAndSortedClans.map((clan) => (
-            expandedClan === clan.tag && (
-              <motion.tr
-                key={`${clan.tag}-participants`}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-              >
-                <td colSpan={8} className="!p-0 bg-secondary/20">
-                  <RiverRaceParticipantsTable participants={clan.participants} />
-                </td>
-              </motion.tr>
-            )
-          ))}
-        </AnimatePresence>
+              </Fragment>
+            ))}
+          </AnimatePresence>
+        </tbody>
       </table>
       {filteredAndSortedClans.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
