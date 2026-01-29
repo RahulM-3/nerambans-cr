@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { ClanMember, SortConfig, FilterConfig, ROLE_HIERARCHY } from '@/types/clan';
 import { RoleBadge } from './RoleBadge';
 import { SortArrow } from './SortArrow';
 import { FilterInput } from './FilterInput';
-import { useScrollPreservation } from '@/hooks/useScrollPreservation';
+import { formatLastSeen, getLastSeenEpoch } from '@/utils/dateUtils';
 
 interface MembersTableProps {
   members: ClanMember[];
@@ -25,7 +25,29 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'clanRank', direction: 'asc' });
   const [filters, setFilters] = useState<FilterConfig>(initialFilters);
   
-  const { scrollRef } = useScrollPreservation([members]);
+  // Manual scroll preservation
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollPositionRef = useRef(0);
+  
+  // Save scroll position before data changes
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    
+    const handleScroll = () => {
+      scrollPositionRef.current = el.scrollTop;
+    };
+    
+    el.addEventListener('scroll', handleScroll);
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  // Restore scroll position after data changes
+  useEffect(() => {
+    if (scrollRef.current && scrollPositionRef.current > 0) {
+      scrollRef.current.scrollTop = scrollPositionRef.current;
+    }
+  }, [members]);
 
   const handleSort = (key: keyof ClanMember) => {
     setSortConfig((prev) => ({
@@ -98,9 +120,10 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
       }
     }
     if (filters.lastSeen) {
-      result = result.filter((m) =>
-        m.lastSeen.toLowerCase().includes(filters.lastSeen.toLowerCase())
-      );
+      result = result.filter((m) => {
+        const formatted = formatLastSeen(m.lastSeen);
+        return formatted.toLowerCase().includes(filters.lastSeen.toLowerCase());
+      });
     }
 
     // Apply sorting
@@ -113,6 +136,13 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
           const aRank = ROLE_HIERARCHY[a.role] || 0;
           const bRank = ROLE_HIERARCHY[b.role] || 0;
           return sortConfig.direction === 'asc' ? bRank - aRank : aRank - bRank;
+        }
+        
+        // Special handling for lastSeen - use epoch for proper sorting
+        if (key === 'lastSeen') {
+          const aEpoch = getLastSeenEpoch(a.lastSeen);
+          const bEpoch = getLastSeenEpoch(b.lastSeen);
+          return sortConfig.direction === 'asc' ? aEpoch - bEpoch : bEpoch - aEpoch;
         }
 
         const aVal = a[key];
@@ -209,7 +239,7 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
                 {member.clanChestPoints}
               </td>
               <td className={`text-muted-foreground text-sm ${getCellChangeClass(member, 'lastSeen')}`}>
-                {member.lastSeen}
+                {formatLastSeen(member.lastSeen)}
               </td>
             </tr>
           ))}

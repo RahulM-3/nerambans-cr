@@ -159,12 +159,22 @@
     @apply w-full text-sm;
   }
 
+  .data-table thead {
+    @apply sticky top-0 z-20;
+  }
+
   .data-table th {
-    @apply bg-secondary/50 text-muted-foreground font-semibold text-left px-3 py-2 border-b border-border cursor-pointer select-none transition-colors;
+    @apply font-semibold text-left px-3 py-2 border-b border-border cursor-pointer select-none transition-colors;
+    background: hsl(222 47% 11% / 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid hsl(217 33% 30% / 0.5);
+    color: hsl(var(--muted-foreground));
   }
 
   .data-table th:hover {
-    @apply bg-secondary text-foreground;
+    background: hsl(222 47% 14% / 0.9);
+    color: hsl(var(--foreground));
   }
 
   .data-table td {

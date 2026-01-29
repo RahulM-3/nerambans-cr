@@ -9,7 +9,7 @@ export interface ClanMember {
   donations: number;
   donationsReceived: number;
   clanChestPoints: number;
-  lastSeen: string;
+  lastSeen: string | number;
 }
 
 export interface WarLogEntry {
