@@ -3,6 +3,7 @@ import { ClanMember, SortConfig, FilterConfig, ROLE_HIERARCHY } from '@/types/cl
 import { RoleBadge } from './RoleBadge';
 import { SortArrow } from './SortArrow';
 import { FilterInput } from './FilterInput';
+import { RoleFilter } from './RoleFilter';
 import { formatLastSeen, getLastSeenEpoch } from '@/utils/dateUtils';
 
 interface MembersTableProps {
@@ -90,10 +91,8 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
         m.name.toLowerCase().includes(filters.name.toLowerCase())
       );
     }
-    if (filters.role) {
-      result = result.filter((m) =>
-        m.role.toLowerCase().includes(filters.role.toLowerCase())
-      );
+    if (filters.role && filters.role !== 'all') {
+      result = result.filter((m) => m.role === filters.role);
     }
     if (filters.trophies) {
       const minTrophies = parseInt(filters.trophies, 10);
@@ -176,9 +175,6 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
     { key: 'lastSeen', label: 'Last Seen', type: 'text' },
   ];
 
-  const filterKeys: (keyof FilterConfig)[] = [
-    'name', 'role', 'trophies', 'donations', 'donationsReceived', 'clanChestPoints', 'lastSeen'
-  ];
 
   return (
     <div ref={scrollRef} className="overflow-auto max-h-[calc(100vh-200px)] rounded-lg border border-border">
@@ -201,17 +197,64 @@ export function MembersTable({ members, previousMembers, changedFields }: Member
               </th>
             ))}
           </tr>
-          <tr className="bg-secondary/30">
-            {columns.map((col, idx) => (
-              <th key={`filter-${col.key}`} className="!py-1 !cursor-default !hover:bg-secondary/30">
-                <FilterInput
-                  value={filters[filterKeys[idx] as keyof FilterConfig] || ''}
-                  onChange={(value) => updateFilter(filterKeys[idx] as keyof FilterConfig, value)}
-                  placeholder={col.type === 'number' ? '≥' : 'Filter...'}
-                  type={col.type === 'number' ? 'number' : 'text'}
-                />
-              </th>
-            ))}
+          <tr className="bg-card">
+            <th className="!py-1 !cursor-default">
+              <FilterInput
+                value={filters.name}
+                onChange={(value) => updateFilter('name', value)}
+                placeholder="Filter..."
+                type="text"
+              />
+            </th>
+            <th className="!py-1 !cursor-default">
+              <RoleFilter
+                value={filters.role}
+                onChange={(value) => updateFilter('role', value)}
+              />
+            </th>
+            <th className="!py-1 !cursor-default">
+              <FilterInput
+                value={filters.trophies}
+                onChange={(value) => updateFilter('trophies', value)}
+                placeholder="≥"
+                type="number"
+              />
+            </th>
+            <th className="!py-1 !cursor-default">
+              {/* No filter for rank */}
+            </th>
+            <th className="!py-1 !cursor-default">
+              <FilterInput
+                value={filters.donations}
+                onChange={(value) => updateFilter('donations', value)}
+                placeholder="≥"
+                type="number"
+              />
+            </th>
+            <th className="!py-1 !cursor-default">
+              <FilterInput
+                value={filters.donationsReceived}
+                onChange={(value) => updateFilter('donationsReceived', value)}
+                placeholder="≥"
+                type="number"
+              />
+            </th>
+            <th className="!py-1 !cursor-default">
+              <FilterInput
+                value={filters.clanChestPoints}
+                onChange={(value) => updateFilter('clanChestPoints', value)}
+                placeholder="≥"
+                type="number"
+              />
+            </th>
+            <th className="!py-1 !cursor-default">
+              <FilterInput
+                value={filters.lastSeen}
+                onChange={(value) => updateFilter('lastSeen', value)}
+                placeholder="Filter..."
+                type="text"
+              />
+            </th>
           </tr>
         </thead>
         <tbody>
