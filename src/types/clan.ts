@@ -8,43 +8,54 @@ export interface ClanMember {
   previousClanRank: number;
   donations: number;
   donationsReceived: number;
-  clanChestPoints: number;
+  clanChestPoints?: number;
   lastSeen: string | number;
 }
 
-export interface WarLogEntry {
-  seasonId: number;
-  createdDate: string;
-  participants: WarParticipant[];
-  standings: WarStanding[];
-}
-
-export interface WarParticipant {
+export interface RiverRaceParticipant {
   tag: string;
   name: string;
-  cardsEarned: number;
-  battlesPlayed: number;
+  fame: number;
+  repairPoints: number;
+  boatAttacks: number;
+  decksUsed: number;
+  decksUsedToday: number;
+}
+
+export interface RiverRaceClan {
+  tag: string;
+  name: string;
   wins: number;
-  collectionDayBattlesPlayed: number;
-  numberOfBattles: number;
-}
-
-export interface WarStanding {
-  tag: string;
-  name: string;
-  badgeId: number;
+  battlesPlayed: number;
   clanScore: number;
-  participants: number;
-  battlesPlayed: number;
-  wins: number;
   crowns: number;
-  trophyChange: number;
+  participants: RiverRaceParticipant[];
+}
+
+export interface RiverRaceDelta {
+  tag: string;
+  name: string;
+  winsDelta: number;
+  battlesPlayedDelta: number;
+  clanScoreDelta: number;
+  timestamp: number;
+}
+
+export interface UpdatesFile {
+  updated: boolean;
+  files: string[];
+  timestamp: number;
 }
 
 export type SortDirection = 'asc' | 'desc' | null;
 
 export interface SortConfig {
   key: keyof ClanMember | null;
+  direction: SortDirection;
+}
+
+export interface RiverRaceSortConfig {
+  key: keyof RiverRaceClan | null;
   direction: SortDirection;
 }
 
@@ -56,6 +67,14 @@ export interface FilterConfig {
   donationsReceived: string;
   clanChestPoints: string;
   lastSeen: string;
+}
+
+export interface RiverRaceFilterConfig {
+  name: string;
+  clanScore: string;
+  wins: string;
+  battlesPlayed: string;
+  crowns: string;
 }
 
 export const ROLE_HIERARCHY: Record<string, number> = {
