@@ -2,95 +2,88 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Clash Royale Esports Dashboard Design System */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Dark esports theme with gold accents */
+    --background: 222 47% 8%;
+    --foreground: 210 40% 96%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 96%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Gold/Amber primary - Clash Royale inspired */
+    --primary: 43 96% 56%;
+    --primary-foreground: 222 47% 8%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 96%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Cyan accent for interactive elements */
+    --accent: 199 89% 48%;
+    --accent-foreground: 222 47% 8%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 217 33% 22%;
+    --input: 217 33% 17%;
+    --ring: 43 96% 56%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Role colors */
+    --role-leader: 43 96% 56%;
+    --role-coleader: 280 60% 65%;
+    --role-elder: 199 89% 48%;
+    --role-member: 215 20% 55%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Stat change colors */
+    --stat-increase: 142 76% 46%;
+    --stat-decrease: 0 72% 51%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Table specific */
+    --table-row-hover: 217 33% 14%;
+    --table-header: 222 47% 14%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 43 96% 56%;
+    --sidebar-primary-foreground: 222 47% 8%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 217 33% 22%;
+    --sidebar-ring: 43 96% 56%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
+    --background: 222 47% 8%;
+    --foreground: 210 40% 96%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 43 96% 56%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 222 47% 8%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 217 33% 22%;
+    --input: 217 33% 17%;
+    --ring: 43 96% 56%;
   }
 }
 
@@ -100,6 +93,162 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Rajdhani', sans-serif;
+    @apply font-bold tracking-wide;
+  }
+}
+
+@layer components {
+  /* Stat change flash animations */
+  .flash-increase {
+    animation: flash-green 0.8s ease-out;
+  }
+
+  .flash-decrease {
+    animation: flash-red 0.8s ease-out;
+  }
+
+  @keyframes flash-green {
+    0% {
+      background-color: hsl(142 76% 46% / 0.4);
+      box-shadow: inset 0 0 20px hsl(142 76% 46% / 0.3);
+    }
+    100% {
+      background-color: transparent;
+      box-shadow: none;
+    }
+  }
+
+  @keyframes flash-red {
+    0% {
+      background-color: hsl(0 72% 51% / 0.4);
+      box-shadow: inset 0 0 20px hsl(0 72% 51% / 0.3);
+    }
+    100% {
+      background-color: transparent;
+      box-shadow: none;
+    }
+  }
+
+  /* Role badge styles */
+  .role-leader {
+    @apply bg-primary/20 text-primary border border-primary/30;
+  }
+
+  .role-coleader {
+    background-color: hsl(280 60% 65% / 0.2);
+    color: hsl(280 60% 65%);
+    border: 1px solid hsl(280 60% 65% / 0.3);
+  }
+
+  .role-elder {
+    @apply bg-accent/20 text-accent border border-accent/30;
+  }
+
+  .role-member {
+    @apply bg-muted text-muted-foreground border border-border;
+  }
+
+  /* Table styles */
+  .data-table {
+    @apply w-full text-sm;
+  }
+
+  .data-table th {
+    @apply bg-secondary/50 text-muted-foreground font-semibold text-left px-3 py-2 border-b border-border cursor-pointer select-none transition-colors;
+  }
+
+  .data-table th:hover {
+    @apply bg-secondary text-foreground;
+  }
+
+  .data-table td {
+    @apply px-3 py-2 border-b border-border/50;
+  }
+
+  .data-table tr {
+    @apply transition-colors;
+  }
+
+  .data-table tbody tr:hover {
+    background-color: hsl(var(--table-row-hover));
+  }
+
+  /* Filter inputs */
+  .filter-input {
+    @apply w-full bg-secondary/50 border border-border rounded px-2 py-1 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50;
+  }
+
+  /* Sort indicator */
+  .sort-arrow {
+    @apply inline-block ml-1 opacity-50;
+  }
+
+  .sort-arrow.active {
+    @apply opacity-100 text-primary;
+  }
+
+  /* Nav tabs */
+  .nav-tab {
+    @apply px-6 py-3 font-semibold text-muted-foreground transition-all border-b-2 border-transparent;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .nav-tab:hover {
+    @apply text-foreground;
+  }
+
+  .nav-tab.active {
+    @apply text-primary border-primary;
+  }
+
+  /* Card glow effect */
+  .card-glow {
+    @apply relative;
+  }
+
+  .card-glow::before {
+    content: '';
+    @apply absolute inset-0 rounded-lg opacity-0 transition-opacity pointer-events-none;
+    background: radial-gradient(ellipse at center, hsl(43 96% 56% / 0.1), transparent 70%);
+  }
+
+  .card-glow:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-secondary/30 rounded;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(43 96% 56%), hsl(38 92% 50%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-gold {
+    text-shadow: 0 0 20px hsl(43 96% 56% / 0.5);
   }
 }
