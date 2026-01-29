@@ -165,10 +165,11 @@
 
   .data-table th {
     @apply font-semibold text-left px-3 py-2 border-b border-border cursor-pointer select-none transition-colors;
-    background: hsl(222 47% 11% / 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid hsl(217 33% 30% / 0.5);
+    background: hsl(222 47% 14%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid hsl(217 33% 35% / 0.6);
+    box-shadow: 0 4px 12px hsl(222 47% 5% / 0.3);
     color: hsl(var(--muted-foreground));
   }
 
