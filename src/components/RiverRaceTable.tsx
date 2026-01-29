@@ -1,27 +1,35 @@
 import { useState, useMemo, useEffect, useRef, Fragment } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RiverRaceClan, RiverRaceDelta, RiverRaceSortConfig, RiverRaceFilterConfig } from '@/types/clan';
+import { RiverRaceClan, SortDirection } from '@/types/clan';
 import { SortArrow } from './SortArrow';
 import { FilterInput } from './FilterInput';
 import { RiverRaceParticipantsTable } from './RiverRaceParticipantsTable';
-import { ChevronDown, ChevronRight, Ship, TrendingUp } from 'lucide-react';
+import { ChevronDown, ChevronRight, Ship } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface RiverRaceTableProps {
-  riverRace: RiverRaceClan[];
-  deltas: Map<string, RiverRaceDelta>;
+  clans: RiverRaceClan[];
+}
+
+interface RiverRaceSortConfig {
+  key: keyof RiverRaceClan | null;
+  direction: SortDirection;
+}
+
+interface RiverRaceFilterConfig {
+  name: string;
+  fame: string;
+  repairPoints: string;
 }
 
 const initialFilters: RiverRaceFilterConfig = {
   name: '',
-  clanScore: '',
-  wins: '',
-  battlesPlayed: '',
-  crowns: '',
+  fame: '',
+  repairPoints: '',
 };
 
-export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
-  const [sortConfig, setSortConfig] = useState<RiverRaceSortConfig>({ key: 'clanScore', direction: 'desc' });
+export function RiverRaceTable({ clans }: RiverRaceTableProps) {
+  const [sortConfig, setSortConfig] = useState<RiverRaceSortConfig>({ key: 'fame', direction: 'desc' });
   const [filters, setFilters] = useState<RiverRaceFilterConfig>(initialFilters);
   const [expandedClan, setExpandedClan] = useState<string | null>(null);
   
@@ -44,7 +52,7 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
     if (scrollRef.current && scrollPositionRef.current > 0) {
       scrollRef.current.scrollTop = scrollPositionRef.current;
     }
-  }, [riverRace]);
+  }, [clans]);
 
   const handleSort = (key: keyof RiverRaceClan) => {
     setSortConfig((prev) => ({
@@ -62,7 +70,7 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
   };
 
   const filteredAndSortedClans = useMemo(() => {
-    let result = [...riverRace];
+    let result = [...clans];
 
     // Apply filters
     if (filters.name) {
@@ -70,28 +78,16 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
         c.name.toLowerCase().includes(filters.name.toLowerCase())
       );
     }
-    if (filters.clanScore) {
-      const minScore = parseInt(filters.clanScore, 10);
-      if (!isNaN(minScore)) {
-        result = result.filter((c) => c.clanScore >= minScore);
+    if (filters.fame) {
+      const minFame = parseInt(filters.fame, 10);
+      if (!isNaN(minFame)) {
+        result = result.filter((c) => c.fame >= minFame);
       }
     }
-    if (filters.wins) {
-      const minWins = parseInt(filters.wins, 10);
-      if (!isNaN(minWins)) {
-        result = result.filter((c) => c.wins >= minWins);
-      }
-    }
-    if (filters.battlesPlayed) {
-      const minBattles = parseInt(filters.battlesPlayed, 10);
-      if (!isNaN(minBattles)) {
-        result = result.filter((c) => c.battlesPlayed >= minBattles);
-      }
-    }
-    if (filters.crowns) {
-      const minCrowns = parseInt(filters.crowns, 10);
-      if (!isNaN(minCrowns)) {
-        result = result.filter((c) => c.crowns >= minCrowns);
+    if (filters.repairPoints) {
+      const minRepair = parseInt(filters.repairPoints, 10);
+      if (!isNaN(minRepair)) {
+        result = result.filter((c) => c.repairPoints >= minRepair);
       }
     }
 
@@ -117,41 +113,15 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
     }
 
     return result;
-  }, [riverRace, filters, sortConfig]);
+  }, [clans, filters, sortConfig]);
 
   const columns: { key: keyof RiverRaceClan; label: string; type: 'text' | 'number' }[] = [
     { key: 'name', label: 'Clan', type: 'text' },
-    { key: 'clanScore', label: 'Score', type: 'number' },
-    { key: 'wins', label: 'Wins', type: 'number' },
-    { key: 'battlesPlayed', label: 'Battles', type: 'number' },
-    { key: 'crowns', label: 'Crowns', type: 'number' },
+    { key: 'fame', label: 'Fame', type: 'number' },
+    { key: 'repairPoints', label: 'Repair', type: 'number' },
   ];
 
-  const getDeltaDisplay = (clan: RiverRaceClan) => {
-    const delta = deltas.get(clan.tag);
-    if (!delta) return null;
-    
-    const hasChanges = delta.clanScoreDelta !== 0 || delta.winsDelta !== 0 || delta.battlesPlayedDelta !== 0;
-    if (!hasChanges) return null;
-
-    return (
-      <div className="flex items-center gap-2 text-xs">
-        {delta.clanScoreDelta > 0 && (
-          <span className="text-stat-increase flex items-center gap-0.5">
-            <TrendingUp className="w-3 h-3" />+{delta.clanScoreDelta}
-          </span>
-        )}
-        {delta.winsDelta > 0 && (
-          <span className="text-stat-increase">+{delta.winsDelta} wins</span>
-        )}
-        {delta.battlesPlayedDelta > 0 && (
-          <span className="text-muted-foreground">+{delta.battlesPlayedDelta} battles</span>
-        )}
-      </div>
-    );
-  };
-
-  if (riverRace.length === 0) {
+  if (clans.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
         <Ship className="w-16 h-16 mb-4 opacity-30" />
@@ -183,7 +153,6 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
               </th>
             ))}
             <th className="!px-2">Participants</th>
-            <th className="!px-2">Progress</th>
           </tr>
           <tr className="bg-card">
             <th className="!py-1 !px-1 !cursor-default"></th>
@@ -197,37 +166,20 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
             </th>
             <th className="!py-1 !px-2 !cursor-default">
               <FilterInput
-                value={filters.clanScore}
-                onChange={(value) => updateFilter('clanScore', value)}
+                value={filters.fame}
+                onChange={(value) => updateFilter('fame', value)}
                 placeholder="≥"
                 type="number"
               />
             </th>
             <th className="!py-1 !px-2 !cursor-default">
               <FilterInput
-                value={filters.wins}
-                onChange={(value) => updateFilter('wins', value)}
+                value={filters.repairPoints}
+                onChange={(value) => updateFilter('repairPoints', value)}
                 placeholder="≥"
                 type="number"
               />
             </th>
-            <th className="!py-1 !px-2 !cursor-default">
-              <FilterInput
-                value={filters.battlesPlayed}
-                onChange={(value) => updateFilter('battlesPlayed', value)}
-                placeholder="≥"
-                type="number"
-              />
-            </th>
-            <th className="!py-1 !px-2 !cursor-default">
-              <FilterInput
-                value={filters.crowns}
-                onChange={(value) => updateFilter('crowns', value)}
-                placeholder="≥"
-                type="number"
-              />
-            </th>
-            <th className="!py-1 !px-2 !cursor-default"></th>
             <th className="!py-1 !px-2 !cursor-default"></th>
           </tr>
         </thead>
@@ -267,12 +219,9 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
                       </Tooltip>
                     </TooltipProvider>
                   </td>
-                  <td className="text-right tabular-nums !px-2">{clan.clanScore.toLocaleString()}</td>
-                  <td className="text-right tabular-nums !px-2">{clan.wins}</td>
-                  <td className="text-right tabular-nums !px-2">{clan.battlesPlayed}</td>
-                  <td className="text-right tabular-nums !px-2">{clan.crowns}</td>
+                  <td className="text-right tabular-nums !px-2">{clan.fame.toLocaleString()}</td>
+                  <td className="text-right tabular-nums !px-2">{clan.repairPoints.toLocaleString()}</td>
                   <td className="text-center text-muted-foreground !px-2">{clan.participants.length}</td>
-                  <td className="!px-2">{getDeltaDisplay(clan)}</td>
                 </motion.tr>
                 {expandedClan === clan.tag && (
                   <motion.tr
@@ -282,7 +231,7 @@ export function RiverRaceTable({ riverRace, deltas }: RiverRaceTableProps) {
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                   >
-                    <td colSpan={8} className="!p-0 bg-secondary/20">
+                    <td colSpan={5} className="!p-0 bg-secondary/20">
                       <RiverRaceParticipantsTable participants={clan.participants} />
                     </td>
                   </motion.tr>

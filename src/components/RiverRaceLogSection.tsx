@@ -24,12 +24,8 @@ export function RiverRaceLogSection({ log }: RiverRaceLogSectionProps) {
 
   const currentEntry = log.items[selectedIndex];
 
-  // Sort standings by rank, but put our clan first
-  const sortedStandings = [...currentEntry.standings].sort((a, b) => {
-    if (a.clan.tag === OUR_CLAN_TAG) return -1;
-    if (b.clan.tag === OUR_CLAN_TAG) return 1;
-    return a.rank - b.rank;
-  });
+  // Sort standings by fame (descending)
+  const sortedStandings = [...currentEntry.standings].sort((a, b) => b.clan.fame - a.clan.fame);
 
   return (
     <div className="space-y-6">
@@ -76,6 +72,7 @@ export function RiverRaceLogSection({ log }: RiverRaceLogSectionProps) {
             rank={standing.rank}
             isOurClan={standing.clan.tag === OUR_CLAN_TAG}
             trophyChange={standing.trophyChange}
+            showDecksToday={false}
           />
         ))}
       </div>

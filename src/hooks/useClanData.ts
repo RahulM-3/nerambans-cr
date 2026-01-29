@@ -3,9 +3,10 @@ import {
   ClanMember,
   ClanMemberDelta,
   ClanMemberDeltasFile,
+  ClanInfo,
+  ClanInfoDelta,
+  ClanInfoDeltasFile,
   RiverRaceData,
-  RiverRaceParticipantDelta,
-  RiverRaceDeltasFile,
   RiverRaceLogFile,
   UpdatesFile,
 } from '@/types/clan';
@@ -15,8 +16,9 @@ const POLL_INTERVAL = 3000; // Check updates.json every 3 seconds
 interface UseClanDataReturn {
   members: ClanMember[];
   memberDeltas: Map<string, ClanMemberDelta>;
+  clanInfo: ClanInfo | null;
+  clanInfoDelta: ClanInfoDelta | null;
   riverRace: RiverRaceData | null;
-  riverRaceDeltas: Map<string, RiverRaceParticipantDelta>;
   riverRaceLog: RiverRaceLogFile | null;
   isLoading: boolean;
   error: string | null;
@@ -26,8 +28,9 @@ interface UseClanDataReturn {
 export function useClanData(): UseClanDataReturn {
   const [members, setMembers] = useState<ClanMember[]>([]);
   const [memberDeltas, setMemberDeltas] = useState<Map<string, ClanMemberDelta>>(new Map());
+  const [clanInfo, setClanInfo] = useState<ClanInfo | null>(null);
+  const [clanInfoDelta, setClanInfoDelta] = useState<ClanInfoDelta | null>(null);
   const [riverRace, setRiverRace] = useState<RiverRaceData | null>(null);
-  const [riverRaceDeltas, setRiverRaceDeltas] = useState<Map<string, RiverRaceParticipantDelta>>(new Map());
   const [riverRaceLog, setRiverRaceLog] = useState<RiverRaceLogFile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,20 +54,25 @@ export function useClanData(): UseClanDataReturn {
     setMemberDeltas(deltaMap);
   }, []);
 
+  const fetchClanInfo = useCallback(async () => {
+    const res = await fetch('/data/clan_info.json');
+    if (!res.ok) throw new Error('Failed to fetch clan info');
+    const data: ClanInfo = await res.json();
+    setClanInfo(data);
+  }, []);
+
+  const fetchClanInfoDeltas = useCallback(async () => {
+    const res = await fetch('/data/clan_info_deltas.json');
+    if (!res.ok) throw new Error('Failed to fetch clan info deltas');
+    const data: ClanInfoDeltasFile = await res.json();
+    setClanInfoDelta(data.delta);
+  }, []);
+
   const fetchRiverRace = useCallback(async () => {
     const res = await fetch('/data/river_race.json');
     if (!res.ok) throw new Error('Failed to fetch river race data');
     const data: RiverRaceData = await res.json();
     setRiverRace(data);
-  }, []);
-
-  const fetchRiverRaceDeltas = useCallback(async () => {
-    const res = await fetch('/data/river_race_deltas.json');
-    if (!res.ok) throw new Error('Failed to fetch river race deltas');
-    const data: RiverRaceDeltasFile = await res.json();
-    const deltaMap = new Map<string, RiverRaceParticipantDelta>();
-    data.deltas.forEach(delta => deltaMap.set(delta.tag, delta));
-    setRiverRaceDeltas(deltaMap);
   }, []);
 
   const fetchRiverRaceLog = useCallback(async () => {
@@ -91,11 +99,14 @@ export function useClanData(): UseClanDataReturn {
         if (filesToUpdate.includes('clan_members_deltas.json')) {
           fetchPromises.push(fetchMemberDeltas());
         }
+        if (filesToUpdate.includes('clan_info.json')) {
+          fetchPromises.push(fetchClanInfo());
+        }
+        if (filesToUpdate.includes('clan_info_deltas.json')) {
+          fetchPromises.push(fetchClanInfoDeltas());
+        }
         if (filesToUpdate.includes('river_race.json')) {
           fetchPromises.push(fetchRiverRace());
-        }
-        if (filesToUpdate.includes('river_race_deltas.json')) {
-          fetchPromises.push(fetchRiverRaceDeltas());
         }
         if (filesToUpdate.includes('river_race_log.json')) {
           fetchPromises.push(fetchRiverRaceLog());
@@ -111,7 +122,7 @@ export function useClanData(): UseClanDataReturn {
     } catch (err) {
       console.log('Update check failed:', err);
     }
-  }, [fetchMembers, fetchMemberDeltas, fetchRiverRace, fetchRiverRaceDeltas, fetchRiverRaceLog]);
+  }, [fetchMembers, fetchMemberDeltas, fetchClanInfo, fetchClanInfoDeltas, fetchRiverRace, fetchRiverRaceLog]);
 
   // Initial data load
   useEffect(() => {
@@ -121,8 +132,9 @@ export function useClanData(): UseClanDataReturn {
         await Promise.all([
           fetchMembers(),
           fetchMemberDeltas(),
+          fetchClanInfo(),
+          fetchClanInfoDeltas(),
           fetchRiverRace(),
-          fetchRiverRaceDeltas(),
           fetchRiverRaceLog(),
         ]);
         setLastUpdated(new Date());
@@ -135,7 +147,7 @@ export function useClanData(): UseClanDataReturn {
     };
 
     loadInitialData();
-  }, [fetchMembers, fetchMemberDeltas, fetchRiverRace, fetchRiverRaceDeltas, fetchRiverRaceLog]);
+  }, [fetchMembers, fetchMemberDeltas, fetchClanInfo, fetchClanInfoDeltas, fetchRiverRace, fetchRiverRaceLog]);
 
   // Poll updates.json for changes
   useEffect(() => {
@@ -146,8 +158,9 @@ export function useClanData(): UseClanDataReturn {
   return {
     members,
     memberDeltas,
+    clanInfo,
+    clanInfoDelta,
     riverRace,
-    riverRaceDeltas,
     riverRaceLog,
     isLoading,
     error,

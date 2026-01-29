@@ -118,6 +118,47 @@ export interface RiverRaceLogFile {
   items: RiverRaceLogEntry[];
 }
 
+// Clan Info Types
+export interface ClanInfo {
+  tag: string;
+  name: string;
+  type: string;
+  description: string;
+  badgeId: number;
+  members: number;
+  requiredTrophies: number;
+  clanScore: number;
+  clanWarTrophies: number;
+  donationsPerWeek: number;
+  clanChestStatus: string;
+  clanChestLevel: number;
+  clanChestMaxLevel: number;
+  clanChestPoints: number;
+  location: {
+    id: number;
+    name: string;
+    isCountry: boolean;
+  };
+}
+
+export interface ClanInfoDelta {
+  clanScoreDelta: number;
+  clanWarTrophiesDelta: number;
+  donationsPerWeekDelta: number;
+  clanChestPointsDelta: number;
+  lastClanScore: number;
+  lastClanWarTrophies: number;
+  lastDonationsPerWeek: number;
+  lastClanChestPoints: number;
+}
+
+export interface ClanInfoDeltasFile {
+  _meta: {
+    lastReset: string;
+  };
+  delta: ClanInfoDelta;
+}
+
 // Updates file type
 export interface UpdatesFile {
   updatedFiles: string[];

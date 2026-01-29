@@ -11,16 +11,15 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<'members' | 'riverrace' | 'history'>('members');
   const { 
     members, 
-    memberDeltas, 
+    memberDeltas,
+    clanInfo,
+    clanInfoDelta,
     riverRace, 
-    riverRaceDeltas, 
     riverRaceLog, 
     isLoading, 
     error, 
     lastUpdated 
   } = useClanData();
-
-  const topTrophies = members.length > 0 ? Math.max(...members.map(m => m.trophies)) : 0;
 
   if (isLoading && members.length === 0) {
     return (
@@ -47,8 +46,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader
-        memberCount={members.length}
-        topTrophies={topTrophies}
+        clanInfo={clanInfo}
+        clanInfoDelta={clanInfoDelta}
         lastUpdated={lastUpdated}
         isLoading={isLoading}
         riverRace={riverRace}
@@ -64,11 +63,8 @@ const Index = () => {
               memberDeltas={memberDeltas}
             />
           )}
-          {activeTab === 'riverrace' && riverRace && (
-            <RiverRaceSection 
-              riverRace={riverRace} 
-              deltas={riverRaceDeltas} 
-            />
+          {activeTab === 'riverrace' && riverRace && clanInfo && (
+            <RiverRaceSection riverRace={riverRace} ourClanTag={clanInfo.tag} />
           )}
           {activeTab === 'history' && riverRaceLog && (
             <RiverRaceLogSection log={riverRaceLog} />

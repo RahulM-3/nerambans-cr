@@ -1,19 +1,26 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Trophy, Medal, Award, CircleDot } from 'lucide-react';
-import { RiverRaceClan, RiverRaceParticipant, RiverRaceParticipantDelta } from '@/types/clan';
-import { DeltaIndicator } from './DeltaIndicator';
+import { ChevronDown, ChevronRight, Trophy, Medal, Award, CircleDot, Users, Layers, Ship, Wrench } from 'lucide-react';
+import { RiverRaceClan } from '@/types/clan';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ClanExpandableCardProps {
   clan: RiverRaceClan;
   rank: number;
   isOurClan: boolean;
-  deltas?: Map<string, RiverRaceParticipantDelta>;
   trophyChange?: number;
+  showDecksToday?: boolean;
+  showCollectiveStats?: boolean;
 }
 
-export function ClanExpandableCard({ clan, rank, isOurClan, deltas, trophyChange }: ClanExpandableCardProps) {
+export function ClanExpandableCard({ 
+  clan, 
+  rank, 
+  isOurClan, 
+  trophyChange, 
+  showDecksToday = false,
+  showCollectiveStats = false 
+}: ClanExpandableCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getRankIcon = (r: number) => {
@@ -25,6 +32,19 @@ export function ClanExpandableCard({ clan, rank, isOurClan, deltas, trophyChange
 
   const sortedParticipants = [...(clan.participants || [])].sort((a, b) => b.fame - a.fame);
 
+  // Calculate collective stats from participants
+  const collectiveStats = useMemo(() => {
+    if (!clan.participants) return { attacked: 0, decksUsedToday: 0, boatAttacks: 0, repairPoints: 0 };
+    
+    const participants = clan.participants;
+    const attacked = participants.filter(p => p.decksUsed > 0).length;
+    const decksUsedToday = participants.reduce((sum, p) => sum + p.decksUsedToday, 0);
+    const boatAttacks = participants.reduce((sum, p) => sum + p.boatAttacks, 0);
+    const repairPoints = participants.reduce((sum, p) => sum + p.repairPoints, 0);
+    
+    return { attacked, decksUsedToday, boatAttacks, repairPoints };
+  }, [clan.participants]);
+
   return (
     <div 
       className={`bg-card rounded-lg border overflow-hidden transition-all ${
@@ -34,58 +54,83 @@ export function ClanExpandableCard({ clan, rank, isOurClan, deltas, trophyChange
       {/* Clan Header - Clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-4 hover:bg-secondary/50 transition-colors text-left"
+        className="w-full flex flex-col p-4 hover:bg-secondary/50 transition-colors text-left"
       >
-        <div className="flex items-center gap-3">
-          {getRankIcon(rank)}
-          <div>
-            <div className="flex items-center gap-2">
-              <span className={`font-semibold ${isOurClan ? 'text-primary' : ''}`}>
-                {clan.name}
-              </span>
-              {isOurClan && <span className="text-yellow-500">⭐</span>}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-xs text-muted-foreground cursor-help font-mono">
-                    {clan.tag}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Clan Tag</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {clan.participants?.length || 0} participants
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-6">
-          <div className="text-right">
-            <div className="text-lg font-bold tabular-nums">{clan.fame.toLocaleString()}</div>
-            <div className="text-xs text-muted-foreground">Fame</div>
-          </div>
-          <div className="text-right">
-            <div className="font-semibold tabular-nums">{clan.repairPoints}</div>
-            <div className="text-xs text-muted-foreground">Repair</div>
-          </div>
-          {trophyChange !== undefined && (
-            <div className="text-right">
-              <div className={`font-semibold tabular-nums ${
-                trophyChange > 0 ? 'text-emerald-500' : trophyChange < 0 ? 'text-red-500' : 'text-muted-foreground'
-              }`}>
-                {trophyChange > 0 && '+'}{trophyChange}
+        {/* Top row: Rank, Name, Fame */}
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-3">
+            {getRankIcon(rank)}
+            <div>
+              <div className="flex items-center gap-2">
+                <span className={`font-semibold ${isOurClan ? 'text-primary' : ''}`}>
+                  {clan.name}
+                </span>
+                {isOurClan && <span className="text-yellow-500">⭐</span>}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-xs text-muted-foreground cursor-help font-mono">
+                      {clan.tag}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Clan Tag</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
-              <div className="text-xs text-muted-foreground">Trophies</div>
+              <div className="text-sm text-muted-foreground">
+                {clan.participants?.length || 0} participants
+              </div>
             </div>
-          )}
-          {isExpanded ? (
-            <ChevronDown className="w-5 h-5 text-muted-foreground" />
-          ) : (
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
-          )}
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <div className="text-right">
+              <div className="text-lg font-bold tabular-nums">{clan.fame.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Fame</div>
+            </div>
+            {trophyChange !== undefined && (
+              <div className="text-right">
+                <div className={`font-semibold tabular-nums ${
+                  trophyChange > 0 ? 'text-emerald-500' : trophyChange < 0 ? 'text-red-500' : 'text-muted-foreground'
+                }`}>
+                  {trophyChange > 0 && '+'}{trophyChange}
+                </div>
+                <div className="text-xs text-muted-foreground">Trophies</div>
+              </div>
+            )}
+            {isExpanded ? (
+              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            ) : (
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            )}
+          </div>
         </div>
+
+        {/* Collective Stats Row */}
+        {showCollectiveStats && (
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border/50 text-sm">
+            <div className="flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-primary" />
+              <span className="font-medium tabular-nums">{collectiveStats.attacked}</span>
+              <span className="text-muted-foreground">Attacked</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Layers className="w-4 h-4 text-blue-500" />
+              <span className="font-medium tabular-nums">{collectiveStats.decksUsedToday}</span>
+              <span className="text-muted-foreground">Decks Today</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Ship className="w-4 h-4 text-purple-500" />
+              <span className="font-medium tabular-nums">{collectiveStats.boatAttacks}</span>
+              <span className="text-muted-foreground">Boat Attacks</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Wrench className="w-4 h-4 text-amber-500" />
+              <span className="font-medium tabular-nums">{collectiveStats.repairPoints}</span>
+              <span className="text-muted-foreground">Repair Pts</span>
+            </div>
+          </div>
+        )}
       </button>
 
       {/* Participants Table - Expandable */}
@@ -100,65 +145,44 @@ export function ClanExpandableCard({ clan, rank, isOurClan, deltas, trophyChange
           >
             <div className="border-t border-border">
               <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
-                <table className="data-table table-fixed w-full">
-                  <thead className="sticky top-0 z-10 bg-card">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 z-10 bg-card border-b border-border">
                     <tr>
-                      <th className="w-[40%] text-left">Name</th>
-                      <th className="w-[12%] text-right">Fame</th>
-                      <th className="w-[12%] text-right">Repair</th>
-                      <th className="w-[12%] text-right">Boat</th>
-                      <th className="w-[12%] text-right">Decks</th>
-                      <th className="w-[12%] text-right">Today</th>
+                      <th className="text-left px-3 py-2 font-medium text-muted-foreground min-w-[150px]">Name</th>
+                      <th className="text-right px-3 py-2 font-medium text-muted-foreground w-20">Fame</th>
+                      <th className="text-right px-3 py-2 font-medium text-muted-foreground w-16">Repair</th>
+                      <th className="text-right px-3 py-2 font-medium text-muted-foreground w-14">Boat</th>
+                      <th className="text-right px-3 py-2 font-medium text-muted-foreground w-14">Decks</th>
+                      {showDecksToday && (
+                        <th className="text-right px-3 py-2 font-medium text-muted-foreground w-16">Today</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
-                    {sortedParticipants.map((p) => {
-                      const delta = isOurClan && deltas ? deltas.get(p.tag) : undefined;
-                      return (
-                        <tr key={p.tag}>
-                          <td className="font-medium text-left truncate">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="cursor-help">{p.name}</span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p className="font-mono text-xs">{p.tag}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </td>
-                          <td className="text-right tabular-nums">
-                            <span className="inline-flex items-center justify-end gap-1">
-                              {p.fame.toLocaleString()}
-                              {delta && <DeltaIndicator value={delta.fameDelta} />}
-                            </span>
-                          </td>
-                          <td className="text-right tabular-nums">
-                            <span className="inline-flex items-center justify-end gap-1">
-                              {p.repairPoints}
-                              {delta && <DeltaIndicator value={delta.repairPointsDelta} />}
-                            </span>
-                          </td>
-                          <td className="text-right tabular-nums">
-                            <span className="inline-flex items-center justify-end gap-1">
-                              {p.boatAttacks}
-                              {delta && <DeltaIndicator value={delta.boatAttacksDelta} />}
-                            </span>
-                          </td>
-                          <td className="text-right tabular-nums">
-                            <span className="inline-flex items-center justify-end gap-1">
-                              {p.decksUsed}
-                              {delta && <DeltaIndicator value={delta.decksUsedDelta} />}
-                            </span>
-                          </td>
-                          <td className="text-right tabular-nums text-muted-foreground">
-                            {p.decksUsedToday}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {sortedParticipants.map((p) => (
+                      <tr key={p.tag} className="border-b border-border/50 last:border-b-0 hover:bg-secondary/30">
+                        <td className="px-3 py-2 font-medium">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="cursor-help truncate block max-w-[180px]">{p.name}</span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="font-mono text-xs">{p.tag}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </td>
+                        <td className="text-right px-3 py-2 tabular-nums">{p.fame.toLocaleString()}</td>
+                        <td className="text-right px-3 py-2 tabular-nums">{p.repairPoints}</td>
+                        <td className="text-right px-3 py-2 tabular-nums">{p.boatAttacks}</td>
+                        <td className="text-right px-3 py-2 tabular-nums">{p.decksUsed}</td>
+                        {showDecksToday && (
+                          <td className="text-right px-3 py-2 tabular-nums text-muted-foreground">{p.decksUsedToday}</td>
+                        )}
+                      </tr>
+                    ))}
                     {sortedParticipants.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="text-center text-muted-foreground py-4">
+                        <td colSpan={showDecksToday ? 6 : 5} className="text-center text-muted-foreground py-4">
                           No participants
                         </td>
                       </tr>
