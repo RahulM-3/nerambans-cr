@@ -98,6 +98,7 @@ interface PlayerData {
   }>;
 }
 
+const API_BASE = 'https://linux-server-api-default-rtdb.firebaseio.com/nerambans';
 const POLL_INTERVAL = 500;
 const POLL_TIMEOUT = 60000;
 
@@ -244,11 +245,25 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
       const requestTimestamp = Date.now();
       const startTime = Date.now();
       
-      // Request player data via local API
-      await fetch("http://localhost:8080/request-player", {
-        method: "POST",
+      // Encode tag for Firebase key (replace special chars)
+      const encodedTag = encodeURIComponent(tag);
+      
+      // First check if player info already exists
+      const existingRes = await fetch(`${API_BASE}/players/info.json`);
+      if (existingRes.ok) {
+        const existingData = await existingRes.json();
+        if (existingData?.requestedTag === tag && existingData?.player && existingData?.fetchedAt >= requestTimestamp - 60000) {
+          setPlayerData(existingData);
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      // Request player data by writing to players/request
+      await fetch(`${API_BASE}/players/request.json`, {
+        method: "PUT",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tag })
+        body: JSON.stringify({ tag, timestamp: requestTimestamp })
       });
       
       console.log('Requested player info for tag:', tag);
@@ -261,10 +276,11 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
         }
 
         try {
-          const res = await fetch(`/data/player_info.json?t=${Date.now()}`);
+          const res = await fetch(`${API_BASE}/players/info.json?t=${Date.now()}`);
           if (res.ok) {
             const data = await res.json();
-            if (data.requestedTag === tag && data.player && data.fetchedAt >= requestTimestamp - 60000) {
+            // Verify the data is for the requested player
+            if (data?.requestedTag === tag && data?.player && data?.fetchedAt >= requestTimestamp - 60000) {
               setPlayerData(data);
               setIsLoading(false);
               return;
