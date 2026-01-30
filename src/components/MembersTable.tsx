@@ -138,14 +138,14 @@ export function MembersTable({ members, memberDeltas }: MembersTableProps) {
     return result;
   }, [members, filters, sortConfig]);
 
-  const columns: { key: keyof ClanMember; label: string; type: 'text' | 'number' }[] = [
-    { key: 'clanRank', label: '#', type: 'number' },
-    { key: 'name', label: 'Name', type: 'text' },
-    { key: 'role', label: 'Role', type: 'text' },
-    { key: 'trophies', label: 'Trophies', type: 'number' },
-    { key: 'donations', label: 'Donated', type: 'number' },
-    { key: 'donationsReceived', label: 'Received', type: 'number' },
-    { key: 'lastSeenEpoch', label: 'Last Seen', type: 'number' },
+  const columns: { key: keyof ClanMember | null; label: string; type: 'text' | 'number'; sortable: boolean }[] = [
+    { key: null, label: '#', type: 'number', sortable: false },
+    { key: 'name', label: 'Name', type: 'text', sortable: true },
+    { key: 'role', label: 'Role', type: 'text', sortable: true },
+    { key: 'trophies', label: 'Trophies', type: 'number', sortable: true },
+    { key: 'donations', label: 'Donated', type: 'number', sortable: true },
+    { key: 'donationsReceived', label: 'Received', type: 'number', sortable: true },
+    { key: 'lastSeenEpoch', label: 'Last Seen', type: 'number', sortable: true },
   ];
 
   return (
@@ -154,18 +154,20 @@ export function MembersTable({ members, memberDeltas }: MembersTableProps) {
         <table className="data-table">
           <thead className="sticky top-0 z-10">
             <tr>
-              {columns.map((col) => (
+              {columns.map((col, idx) => (
                 <th
-                  key={col.key}
-                  onClick={() => handleSort(col.key)}
-                  className="whitespace-nowrap"
+                  key={col.key ?? idx}
+                  onClick={col.sortable && col.key ? () => handleSort(col.key as keyof ClanMember) : undefined}
+                  className={`whitespace-nowrap ${!col.sortable ? '!cursor-default' : ''}`}
                 >
                   <div className="flex items-center gap-1">
                     {col.label}
-                    <SortArrow
-                      direction={sortConfig.key === col.key ? sortConfig.direction : null}
-                      isActive={sortConfig.key === col.key}
-                    />
+                    {col.sortable && col.key && (
+                      <SortArrow
+                        direction={sortConfig.key === col.key ? sortConfig.direction : null}
+                        isActive={sortConfig.key === col.key}
+                      />
+                    )}
                   </div>
                 </th>
               ))}
@@ -233,12 +235,17 @@ export function MembersTable({ members, memberDeltas }: MembersTableProps) {
                     {index + 1}
                   </td>
                   <td className="font-medium">
-                    <button
-                      onClick={() => handlePlayerClick(member.tag, member.name)}
-                      className="hover:text-primary hover:underline transition-colors text-left"
-                    >
-                      {member.name}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                        #{member.clanRank}
+                      </span>
+                      <button
+                        onClick={() => handlePlayerClick(member.tag, member.name)}
+                        className="hover:text-primary hover:underline transition-colors text-left"
+                      >
+                        {member.name}
+                      </button>
+                    </div>
                   </td>
                   <td>
                     <RoleBadge role={member.role} />
