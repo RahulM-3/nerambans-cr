@@ -73,6 +73,7 @@ export function RiverRaceLogSection({ log }: RiverRaceLogSectionProps) {
             isOurClan={standing.clan.tag === OUR_CLAN_TAG}
             trophyChange={standing.trophyChange}
             showDecksToday={false}
+            showCollectiveStats={true}
           />
         ))}
       </div>
