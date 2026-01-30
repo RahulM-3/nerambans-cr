@@ -99,7 +99,7 @@ interface PlayerData {
 }
 
 const POLL_INTERVAL = 500;
-const POLL_TIMEOUT = 30000;
+const POLL_TIMEOUT = 60000;
 
 const rarityColors: Record<string, string> = {
   common: 'bg-gray-500',
