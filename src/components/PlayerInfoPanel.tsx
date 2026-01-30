@@ -350,18 +350,18 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
               {/* Header Stats */}
               <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
                 <div className="text-center">
-                  <p className="text-3xl font-bold">{player.expLevel}</p>
+                  <p className="text-3xl font-bold">{player.expLevel ?? 0}</p>
                   <p className="text-xs text-muted-foreground">Level</p>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <Trophy className="w-4 h-4 text-yellow-500" />
-                    <span className="font-semibold">{player.trophies.toLocaleString()}</span>
-                    <span className="text-xs text-muted-foreground">(Best: {player.bestTrophies.toLocaleString()})</span>
+                    <span className="font-semibold">{(player.trophies ?? 0).toLocaleString()}</span>
+                    <span className="text-xs text-muted-foreground">(Best: {(player.bestTrophies ?? 0).toLocaleString()})</span>
                   </div>
                   {player.clan && (
                     <p className="text-sm text-muted-foreground truncate">
-                      {player.clan.name} • {player.arena.name}
+                      {player.clan.name} • {player.arena?.name ?? 'Unknown Arena'}
                     </p>
                   )}
                 </div>
@@ -369,12 +369,12 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
 
               {/* Quick Stats Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <StatCard icon={Swords} label="Battles" value={player.battleCount} subValue={`${player.wins}W / ${player.losses}L`} />
-                <StatCard icon={Crown} label="3-Crown Wins" value={player.threeCrownWins} />
-                <StatCard icon={Gift} label="Donations" value={player.donations} subValue={`Total: ${player.totalDonations.toLocaleString()}`} />
-                <StatCard icon={Users} label="War Day Wins" value={player.warDayWins} />
-                <StatCard icon={Target} label="Challenge Wins" value={player.challengeCardsWon} subValue={`Max: ${player.challengeMaxWins}`} />
-                <StatCard icon={Star} label="Star Points" value={(player as unknown as { starPoints?: number }).starPoints || 0} />
+                <StatCard icon={Swords} label="Battles" value={player.battleCount ?? 0} subValue={`${player.wins ?? 0}W / ${player.losses ?? 0}L`} />
+                <StatCard icon={Crown} label="3-Crown Wins" value={player.threeCrownWins ?? 0} />
+                <StatCard icon={Gift} label="Donations" value={player.donations ?? 0} subValue={`Total: ${(player.totalDonations ?? 0).toLocaleString()}`} />
+                <StatCard icon={Users} label="War Day Wins" value={player.warDayWins ?? 0} />
+                <StatCard icon={Target} label="Challenge Wins" value={player.challengeCardsWon ?? 0} subValue={`Max: ${player.challengeMaxWins ?? 0}`} />
+                <StatCard icon={Star} label="Star Points" value={(player as unknown as { starPoints?: number }).starPoints ?? 0} />
               </div>
 
               {/* Current Deck */}
