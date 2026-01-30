@@ -102,11 +102,6 @@ export function ClanExpandableCard({
         {showCollectiveStats && (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2.5 pt-2.5 border-t border-border/50 text-sm">
             <div className="flex items-center gap-1.5">
-              <Trophy className="w-4 h-4 text-yellow-500" />
-              <span className="font-medium tabular-nums">{collectiveStats.fame.toLocaleString()}</span>
-              <span className="text-muted-foreground">Fame</span>
-            </div>
-            <div className="flex items-center gap-1.5">
               <Wrench className="w-4 h-4 text-orange-500" />
               <span className="font-medium tabular-nums">{collectiveStats.repairPoints}</span>
               <span className="text-muted-foreground">Repair</span>
@@ -126,17 +121,6 @@ export function ClanExpandableCard({
                 <Layers className="w-4 h-4 text-blue-500" />
                 <span className="font-medium tabular-nums">{collectiveStats.decksUsedToday}</span>
                 <span className="text-muted-foreground">Today</span>
-              </div>
-            )}
-            {trophyChange !== undefined && (
-              <div className="flex items-center gap-1.5">
-                <Medal className="w-4 h-4 text-amber-500" />
-                <span className={`font-medium tabular-nums ${
-                  trophyChange > 0 ? 'text-emerald-500' : trophyChange < 0 ? 'text-red-500' : 'text-muted-foreground'
-                }`}>
-                  {trophyChange > 0 && '+'}{trophyChange}
-                </span>
-                <span className="text-muted-foreground">Trophies</span>
               </div>
             )}
           </div>
