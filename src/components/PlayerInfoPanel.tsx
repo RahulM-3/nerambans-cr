@@ -236,6 +236,32 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Helper to parse stringified JSON from Firebase (player and battlelog are stored as JSON strings)
+  const parsePlayerData = (rawData: Record<string, unknown>): PlayerData | null => {
+    try {
+      let player = rawData.player;
+      let battlelog = rawData.battlelog;
+      
+      // Parse if stored as JSON strings
+      if (typeof player === 'string') {
+        player = JSON.parse(player);
+      }
+      if (typeof battlelog === 'string') {
+        battlelog = JSON.parse(battlelog);
+      }
+      
+      return {
+        requestedTag: rawData.requestedTag as string,
+        fetchedAt: rawData.fetchedAt as number,
+        player: player as PlayerData['player'],
+        battlelog: battlelog as PlayerData['battlelog'],
+      };
+    } catch (e) {
+      console.error('Failed to parse player data:', e);
+      return null;
+    }
+  };
+
   const requestPlayerInfo = useCallback(async (tag: string) => {
     setIsLoading(true);
     setError(null);
@@ -245,17 +271,17 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
       const requestTimestamp = Date.now();
       const startTime = Date.now();
       
-      // Encode tag for Firebase key (replace special chars)
-      const encodedTag = encodeURIComponent(tag);
-      
       // First check if player info already exists
       const existingRes = await fetch(`${API_BASE}/players/info.json`);
       if (existingRes.ok) {
-        const existingData = await existingRes.json();
-        if (existingData?.requestedTag === tag && existingData?.player && existingData?.fetchedAt >= requestTimestamp - 60000) {
-          setPlayerData(existingData);
-          setIsLoading(false);
-          return;
+        const rawData = await existingRes.json();
+        if (rawData?.requestedTag === tag && rawData?.fetchedAt >= requestTimestamp - 60000) {
+          const parsed = parsePlayerData(rawData);
+          if (parsed?.player) {
+            setPlayerData(parsed);
+            setIsLoading(false);
+            return;
+          }
         }
       }
       
@@ -278,12 +304,15 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
         try {
           const res = await fetch(`${API_BASE}/players/info.json?t=${Date.now()}`);
           if (res.ok) {
-            const data = await res.json();
+            const rawData = await res.json();
             // Verify the data is for the requested player
-            if (data?.requestedTag === tag && data?.player && data?.fetchedAt >= requestTimestamp - 60000) {
-              setPlayerData(data);
-              setIsLoading(false);
-              return;
+            if (rawData?.requestedTag === tag && rawData?.fetchedAt >= requestTimestamp - 60000) {
+              const parsed = parsePlayerData(rawData);
+              if (parsed?.player) {
+                setPlayerData(parsed);
+                setIsLoading(false);
+                return;
+              }
             }
           }
         } catch {
