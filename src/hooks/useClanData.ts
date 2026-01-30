@@ -97,22 +97,23 @@ export function useClanData(): UseClanDataReturn {
         const filesToUpdate = updates.updatedFiles || [];
         const fetchPromises: Promise<void>[] = [];
         
-        if (filesToUpdate.includes('members/list')) {
+        // API returns underscore-style names like 'clan_info', 'clan_members'
+        if (filesToUpdate.includes('clan_members')) {
           fetchPromises.push(fetchMembers());
         }
-        if (filesToUpdate.includes('members/deltas')) {
+        if (filesToUpdate.includes('clan_members_deltas')) {
           fetchPromises.push(fetchMemberDeltas());
         }
-        if (filesToUpdate.includes('clan/info')) {
+        if (filesToUpdate.includes('clan_info')) {
           fetchPromises.push(fetchClanInfo());
         }
-        if (filesToUpdate.includes('clan/info_deltas')) {
+        if (filesToUpdate.includes('clan_info_deltas')) {
           fetchPromises.push(fetchClanInfoDeltas());
         }
-        if (filesToUpdate.includes('river/current')) {
+        if (filesToUpdate.includes('river_race')) {
           fetchPromises.push(fetchRiverRace());
         }
-        if (filesToUpdate.includes('river/log')) {
+        if (filesToUpdate.includes('river_race_log')) {
           fetchPromises.push(fetchRiverRaceLog());
         }
         
