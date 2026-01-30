@@ -63,8 +63,8 @@ export function RiverRaceLogSection({ log }: RiverRaceLogSectionProps) {
       </div>
 
       {/* Clans List - Expandable */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold px-1">Final Standings</h2>
+      <div className="space-y-2">
+        <h2 className="text-sm font-semibold text-muted-foreground px-1">Final Standings</h2>
         {sortedStandings.map((standing) => (
           <ClanExpandableCard
             key={standing.clan.tag}

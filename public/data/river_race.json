@@ -357,7 +357,7 @@
       "name": "montoya montoya",
       "badgeId": 16000078,
       "clanScore": 431,
-      "fame": 800,
+      "fame": 1700,
       "repairPoints": 0,
       "finishTime": null,
       "periodPoints": 0,
@@ -410,15 +410,6 @@
         {
           "tag": "#QCR8GP8U2",
           "name": "TarZan",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
-          "tag": "#RYLGCVLGU",
-          "name": "stann22000",
           "fame": 0,
           "repairPoints": 0,
           "boatAttacks": 0,
@@ -498,13 +489,22 @@
           "decksUsedToday": 0
         },
         {
-          "tag": "#J0RVPQYQ9",
-          "name": "kenzo",
-          "fame": 200,
+          "tag": "#RYLGCVLGU",
+          "name": "stann22000",
+          "fame": 500,
           "repairPoints": 0,
           "boatAttacks": 0,
-          "decksUsed": 1,
-          "decksUsedToday": 1
+          "decksUsed": 4,
+          "decksUsedToday": 4
+        },
+        {
+          "tag": "#J0RVPQYQ9",
+          "name": "kenzo",
+          "fame": 600,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 4,
+          "decksUsedToday": 4
         },
         {
           "tag": "#CG80GC2RJ",
@@ -777,7 +777,7 @@
       "name": "NERAMBANS",
       "badgeId": 16000002,
       "clanScore": 493,
-      "fame": 4400,
+      "fame": 7550,
       "repairPoints": 0,
       "finishTime": null,
       "periodPoints": 0,
@@ -785,6 +785,15 @@
         {
           "tag": "#G99JQ0Q9C",
           "name": "Ns Nadish sri",
+          "fame": 0,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 0,
+          "decksUsedToday": 0
+        },
+        {
+          "tag": "#2YPJ90PRP",
+          "name": "#$@SURYA@$#",
           "fame": 0,
           "repairPoints": 0,
           "boatAttacks": 0,
@@ -864,15 +873,6 @@
           "decksUsedToday": 0
         },
         {
-          "tag": "#8QY0RGY8R",
-          "name": "Monkey.D.Luffy",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
           "tag": "#L9UUPGV2G",
           "name": "REDSOULLLLL",
           "fame": 0,
@@ -909,26 +909,8 @@
           "decksUsedToday": 0
         },
         {
-          "tag": "#8L0YPQGY0",
-          "name": "GUSTAVO",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
           "tag": "#9QL9VUV0C",
           "name": "blackwolf",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
-          "tag": "#P2CLLU0J9",
-          "name": "killer",
           "fame": 0,
           "repairPoints": 0,
           "boatAttacks": 0,
@@ -1044,15 +1026,6 @@
           "decksUsedToday": 0
         },
         {
-          "tag": "#Y0LGPV09",
-          "name": "LEGENDARY RAGU.",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
           "tag": "#GC0VR028",
           "name": "Slimshady",
           "fame": 0,
@@ -1145,24 +1118,6 @@
         {
           "tag": "#8Q8P9C0RJ",
           "name": "Lana Del Rey",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
-          "tag": "#G990C9LGL",
-          "name": "yogesh.k",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
-          "tag": "#R09QLQ22V",
-          "name": "Maddy",
           "fame": 0,
           "repairPoints": 0,
           "boatAttacks": 0,
@@ -1296,6 +1251,15 @@
           "decksUsedToday": 0
         },
         {
+          "tag": "#Y0LGPV09",
+          "name": "LEGENDARY RAGU.",
+          "fame": 100,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 1,
+          "decksUsedToday": 1
+        },
+        {
           "tag": "#YPRV0PVUQ",
           "name": "stark",
           "fame": 100,
@@ -1314,9 +1278,9 @@
           "decksUsedToday": 3
         },
         {
-          "tag": "#UVYRCLYUJ",
-          "name": "lusu kudhi",
-          "fame": 300,
+          "tag": "#P2CLLU0J9",
+          "name": "killer",
+          "fame": 400,
           "repairPoints": 0,
           "boatAttacks": 0,
           "decksUsed": 2,
@@ -1341,6 +1305,15 @@
           "decksUsedToday": 3
         },
         {
+          "tag": "#8QY0RGY8R",
+          "name": "Monkey.D.Luffy",
+          "fame": 500,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 4,
+          "decksUsedToday": 4
+        },
+        {
           "tag": "#2JQGYYVGP",
           "name": "\u1e68p\u2c65rt\u2c65\u2602",
           "fame": 500,
@@ -1357,6 +1330,24 @@
           "boatAttacks": 0,
           "decksUsed": 4,
           "decksUsedToday": 4
+        },
+        {
+          "tag": "#G990C9LGL",
+          "name": "yogesh.k",
+          "fame": 500,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 2,
+          "decksUsedToday": 2
+        },
+        {
+          "tag": "#UVYRCLYUJ",
+          "name": "lusu kudhi",
+          "fame": 500,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 3,
+          "decksUsedToday": 3
         },
         {
           "tag": "#GRV08RCYR",
@@ -1377,9 +1368,27 @@
           "decksUsedToday": 4
         },
         {
+          "tag": "#R09QLQ22V",
+          "name": "Maddy",
+          "fame": 650,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 4,
+          "decksUsedToday": 4
+        },
+        {
           "tag": "#VGVUG09CQ",
           "name": "sree",
           "fame": 700,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 4,
+          "decksUsedToday": 4
+        },
+        {
+          "tag": "#8L0YPQGY0",
+          "name": "GUSTAVO",
+          "fame": 800,
           "repairPoints": 0,
           "boatAttacks": 0,
           "decksUsed": 4,
@@ -1392,7 +1401,7 @@
       "name": "Noob",
       "badgeId": 16000160,
       "clanScore": 401,
-      "fame": 0,
+      "fame": 600,
       "repairPoints": 0,
       "finishTime": null,
       "periodPoints": 0,
@@ -1454,15 +1463,6 @@
         {
           "tag": "#GU2YJ0J9Y",
           "name": "yy",
-          "fame": 0,
-          "repairPoints": 0,
-          "boatAttacks": 0,
-          "decksUsed": 0,
-          "decksUsedToday": 0
-        },
-        {
-          "tag": "#ULVRLJQ0U",
-          "name": "shadow",
           "fame": 0,
           "repairPoints": 0,
           "boatAttacks": 0,
@@ -1558,6 +1558,15 @@
           "boatAttacks": 0,
           "decksUsed": 0,
           "decksUsedToday": 0
+        },
+        {
+          "tag": "#ULVRLJQ0U",
+          "name": "shadow",
+          "fame": 600,
+          "repairPoints": 0,
+          "boatAttacks": 0,
+          "decksUsed": 4,
+          "decksUsedToday": 4
         }
       ]
     }

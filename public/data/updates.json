@@ -2,10 +2,7 @@
   "updatedFiles": [
     "clan_info.json",
     "clan_info_deltas.json",
-    "clan_members.json",
-    "clan_members_deltas.json",
-    "river_race.json",
     "river_race_log.json"
   ],
-  "timestamp": 1769699454361
+  "timestamp": 1769743477765
 }

@@ -58,8 +58,8 @@ export function RiverRaceSection({ riverRace, ourClanTag }: RiverRaceSectionProp
       </Card>
 
       {/* Clans List - Expandable */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold px-1">Clan Standings ({sortedClans.length} clans)</h2>
+      <div className="space-y-2">
+        <h2 className="text-sm font-semibold text-muted-foreground px-1">Clan Standings ({sortedClans.length} clans)</h2>
         {sortedClans.map((clan, index) => (
           <ClanExpandableCard
             key={clan.tag}

@@ -47,35 +47,26 @@ export function ClanExpandableCard({
 
   return (
     <div 
-      className={`bg-card rounded-lg border overflow-hidden transition-all ${
+      className={`bg-card rounded-lg border overflow-hidden transition-all max-w-2xl mx-auto ${
         isOurClan ? 'border-primary ring-1 ring-primary/30' : 'border-border'
       }`}
     >
       {/* Clan Header - Clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex flex-col p-4 hover:bg-secondary/50 transition-colors text-left"
+        className="w-full flex flex-col px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
       >
         {/* Top row: Rank, Name, Fame */}
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between w-full gap-4">
+          <div className="flex items-center gap-3 min-w-0">
             {getRankIcon(rank)}
-            <div>
-              <div className="flex items-center gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className={`font-semibold ${isOurClan ? 'text-primary' : ''}`}>
                   {clan.name}
                 </span>
                 {isOurClan && <span className="text-yellow-500">⭐</span>}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="text-xs text-muted-foreground cursor-help font-mono">
-                      {clan.tag}
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Clan Tag</p>
-                  </TooltipContent>
-                </Tooltip>
+                <span className="text-xs text-muted-foreground font-mono">{clan.tag}</span>
               </div>
               <div className="text-sm text-muted-foreground">
                 {clan.participants?.length || 0} participants
@@ -83,7 +74,7 @@ export function ClanExpandableCard({
             </div>
           </div>
           
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5 shrink-0">
             <div className="text-right">
               <div className="text-lg font-bold tabular-nums">{clan.fame.toLocaleString()}</div>
               <div className="text-xs text-muted-foreground">Fame</div>
@@ -108,7 +99,7 @@ export function ClanExpandableCard({
 
         {/* Collective Stats Row */}
         {showCollectiveStats && (
-          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border/50 text-sm">
+          <div className="flex items-center gap-4 mt-2.5 pt-2.5 border-t border-border/50 text-sm">
             <div className="flex items-center gap-1.5">
               <Users className="w-4 h-4 text-primary" />
               <span className="font-medium tabular-nums">{collectiveStats.attacked}</span>
@@ -117,17 +108,17 @@ export function ClanExpandableCard({
             <div className="flex items-center gap-1.5">
               <Layers className="w-4 h-4 text-blue-500" />
               <span className="font-medium tabular-nums">{collectiveStats.decksUsedToday}</span>
-              <span className="text-muted-foreground">Decks Today</span>
+              <span className="text-muted-foreground">Today</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Ship className="w-4 h-4 text-purple-500" />
               <span className="font-medium tabular-nums">{collectiveStats.boatAttacks}</span>
-              <span className="text-muted-foreground">Boat Attacks</span>
+              <span className="text-muted-foreground">Boat</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Wrench className="w-4 h-4 text-amber-500" />
               <span className="font-medium tabular-nums">{collectiveStats.repairPoints}</span>
-              <span className="text-muted-foreground">Repair Pts</span>
+              <span className="text-muted-foreground">Repair</span>
             </div>
           </div>
         )}
@@ -140,7 +131,7 @@ export function ClanExpandableCard({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
             className="overflow-hidden"
           >
             <div className="border-t border-border">
@@ -148,35 +139,35 @@ export function ClanExpandableCard({
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 z-10 bg-card border-b border-border">
                     <tr>
-                      <th className="text-left px-3 py-2 font-medium text-muted-foreground min-w-[150px]">Name</th>
-                      <th className="text-right px-3 py-2 font-medium text-muted-foreground w-20">Fame</th>
-                      <th className="text-right px-3 py-2 font-medium text-muted-foreground w-16">Repair</th>
-                      <th className="text-right px-3 py-2 font-medium text-muted-foreground w-14">Boat</th>
-                      <th className="text-right px-3 py-2 font-medium text-muted-foreground w-14">Decks</th>
+                      <th className="text-left px-3 py-2 font-medium text-muted-foreground">Name</th>
+                      <th className="text-right px-3 py-2 font-medium text-muted-foreground">Fame</th>
+                      <th className="text-right px-3 py-2 font-medium text-muted-foreground">Repair</th>
+                      <th className="text-right px-3 py-2 font-medium text-muted-foreground">Boat</th>
+                      <th className="text-right px-3 py-2 font-medium text-muted-foreground">Decks</th>
                       {showDecksToday && (
-                        <th className="text-right px-3 py-2 font-medium text-muted-foreground w-16">Today</th>
+                        <th className="text-right px-3 py-2 font-medium text-muted-foreground">Today</th>
                       )}
                     </tr>
                   </thead>
                   <tbody>
                     {sortedParticipants.map((p) => (
-                      <tr key={p.tag} className="border-b border-border/50 last:border-b-0 hover:bg-secondary/30">
-                        <td className="px-3 py-2 font-medium">
+                      <tr key={p.tag} className="border-b border-border/30 last:border-b-0 hover:bg-secondary/30">
+                        <td className="px-3 py-1.5 font-medium">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className="cursor-help truncate block max-w-[180px]">{p.name}</span>
+                              <span className="cursor-help">{p.name}</span>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="font-mono text-xs">{p.tag}</p>
                             </TooltipContent>
                           </Tooltip>
                         </td>
-                        <td className="text-right px-3 py-2 tabular-nums">{p.fame.toLocaleString()}</td>
-                        <td className="text-right px-3 py-2 tabular-nums">{p.repairPoints}</td>
-                        <td className="text-right px-3 py-2 tabular-nums">{p.boatAttacks}</td>
-                        <td className="text-right px-3 py-2 tabular-nums">{p.decksUsed}</td>
+                        <td className="text-right px-3 py-1.5 tabular-nums">{p.fame.toLocaleString()}</td>
+                        <td className="text-right px-3 py-1.5 tabular-nums">{p.repairPoints}</td>
+                        <td className="text-right px-3 py-1.5 tabular-nums">{p.boatAttacks}</td>
+                        <td className="text-right px-3 py-1.5 tabular-nums">{p.decksUsed}</td>
                         {showDecksToday && (
-                          <td className="text-right px-3 py-2 tabular-nums text-muted-foreground">{p.decksUsedToday}</td>
+                          <td className="text-right px-3 py-1.5 tabular-nums text-muted-foreground">{p.decksUsedToday}</td>
                         )}
                       </tr>
                     ))}
