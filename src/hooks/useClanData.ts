@@ -11,7 +11,8 @@ import {
   UpdatesFile,
 } from '@/types/clan';
 
-const POLL_INTERVAL = 3000; // Check updates.json every 3 seconds
+const API_BASE = 'https://linux-server-api-default-rtdb.firebaseio.com/nerambans';
+const POLL_INTERVAL = 3000;
 
 interface UseClanDataReturn {
   members: ClanMember[];
@@ -39,76 +40,79 @@ export function useClanData(): UseClanDataReturn {
   const lastProcessedTimestamp = useRef<number>(0);
 
   const fetchMembers = useCallback(async () => {
-    const res = await fetch('/data/clan_members.json');
+    const res = await fetch(`${API_BASE}/members/list.json`);
     if (!res.ok) throw new Error('Failed to fetch clan members');
-    const data: ClanMember[] = await res.json();
-    setMembers(data);
+    const data = await res.json();
+    if (data) setMembers(Array.isArray(data) ? data : Object.values(data));
   }, []);
 
   const fetchMemberDeltas = useCallback(async () => {
-    const res = await fetch('/data/clan_members_deltas.json');
+    const res = await fetch(`${API_BASE}/members/deltas.json`);
     if (!res.ok) throw new Error('Failed to fetch member deltas');
     const data: ClanMemberDeltasFile = await res.json();
-    const deltaMap = new Map<string, ClanMemberDelta>();
-    data.deltas.forEach(delta => deltaMap.set(delta.tag, delta));
-    setMemberDeltas(deltaMap);
+    if (data?.deltas) {
+      const deltaMap = new Map<string, ClanMemberDelta>();
+      data.deltas.forEach(delta => deltaMap.set(delta.tag, delta));
+      setMemberDeltas(deltaMap);
+    }
   }, []);
 
   const fetchClanInfo = useCallback(async () => {
-    const res = await fetch('/data/clan_info.json');
+    const res = await fetch(`${API_BASE}/clan/info.json`);
     if (!res.ok) throw new Error('Failed to fetch clan info');
     const data: ClanInfo = await res.json();
-    setClanInfo(data);
+    if (data) setClanInfo(data);
   }, []);
 
   const fetchClanInfoDeltas = useCallback(async () => {
-    const res = await fetch('/data/clan_info_deltas.json');
+    const res = await fetch(`${API_BASE}/clan/info_deltas.json`);
     if (!res.ok) throw new Error('Failed to fetch clan info deltas');
     const data: ClanInfoDeltasFile = await res.json();
-    setClanInfoDelta(data.delta);
+    if (data?.delta) setClanInfoDelta(data.delta);
   }, []);
 
   const fetchRiverRace = useCallback(async () => {
-    const res = await fetch('/data/river_race.json');
+    const res = await fetch(`${API_BASE}/river/current.json`);
     if (!res.ok) throw new Error('Failed to fetch river race data');
     const data: RiverRaceData = await res.json();
-    setRiverRace(data);
+    if (data) setRiverRace(data);
   }, []);
 
   const fetchRiverRaceLog = useCallback(async () => {
-    const res = await fetch('/data/river_race_log.json');
+    const res = await fetch(`${API_BASE}/river/log.json`);
     if (!res.ok) throw new Error('Failed to fetch river race log');
     const data: RiverRaceLogFile = await res.json();
-    setRiverRaceLog(data);
+    if (data) setRiverRaceLog(data);
   }, []);
 
   const checkForUpdates = useCallback(async () => {
     try {
-      const res = await fetch('/data/updates.json');
+      const res = await fetch(`${API_BASE}/updates.json`);
       if (!res.ok) return;
       
       const updates: UpdatesFile = await res.json();
+      if (!updates) return;
       
       if (updates.timestamp > lastProcessedTimestamp.current) {
-        const filesToUpdate = updates.updatedFiles;
+        const filesToUpdate = updates.updatedFiles || [];
         const fetchPromises: Promise<void>[] = [];
         
-        if (filesToUpdate.includes('clan_members.json')) {
+        if (filesToUpdate.includes('members/list')) {
           fetchPromises.push(fetchMembers());
         }
-        if (filesToUpdate.includes('clan_members_deltas.json')) {
+        if (filesToUpdate.includes('members/deltas')) {
           fetchPromises.push(fetchMemberDeltas());
         }
-        if (filesToUpdate.includes('clan_info.json')) {
+        if (filesToUpdate.includes('clan/info')) {
           fetchPromises.push(fetchClanInfo());
         }
-        if (filesToUpdate.includes('clan_info_deltas.json')) {
+        if (filesToUpdate.includes('clan/info_deltas')) {
           fetchPromises.push(fetchClanInfoDeltas());
         }
-        if (filesToUpdate.includes('river_race.json')) {
+        if (filesToUpdate.includes('river/current')) {
           fetchPromises.push(fetchRiverRace());
         }
-        if (filesToUpdate.includes('river_race_log.json')) {
+        if (filesToUpdate.includes('river/log')) {
           fetchPromises.push(fetchRiverRaceLog());
         }
         
@@ -149,7 +153,7 @@ export function useClanData(): UseClanDataReturn {
     loadInitialData();
   }, [fetchMembers, fetchMemberDeltas, fetchClanInfo, fetchClanInfoDeltas, fetchRiverRace, fetchRiverRaceLog]);
 
-  // Poll updates.json for changes
+  // Poll updates for changes
   useEffect(() => {
     const interval = setInterval(checkForUpdates, POLL_INTERVAL);
     return () => clearInterval(interval);
