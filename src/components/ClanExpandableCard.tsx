@@ -34,16 +34,17 @@ export function ClanExpandableCard({
 
   // Calculate collective stats from participants
   const collectiveStats = useMemo(() => {
-    if (!clan.participants) return { fame: 0, repairPoints: 0, decksUsed: 0, decksUsedToday: 0, boatAttacks: 0 };
+    if (!clan.participants) return { attacked: 0, fame: 0, repairPoints: 0, decksUsed: 0, decksUsedToday: 0, boatAttacks: 0 };
     
     const participants = clan.participants;
+    const attacked = participants.filter(p => p.decksUsed > 0).length;
     const fame = participants.reduce((sum, p) => sum + p.fame, 0);
     const repairPoints = participants.reduce((sum, p) => sum + p.repairPoints, 0);
     const decksUsed = participants.reduce((sum, p) => sum + p.decksUsed, 0);
     const decksUsedToday = participants.reduce((sum, p) => sum + p.decksUsedToday, 0);
     const boatAttacks = participants.reduce((sum, p) => sum + p.boatAttacks, 0);
     
-    return { fame, repairPoints, decksUsed, decksUsedToday, boatAttacks };
+    return { attacked, fame, repairPoints, decksUsed, decksUsedToday, boatAttacks };
   }, [clan.participants]);
 
   return (
@@ -101,6 +102,11 @@ export function ClanExpandableCard({
         {/* Collective Stats Row */}
         {showCollectiveStats && (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2.5 pt-2.5 border-t border-border/50 text-sm">
+            <div className="flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-primary" />
+              <span className="font-medium tabular-nums">{collectiveStats.attacked}</span>
+              <span className="text-muted-foreground">Attacked</span>
+            </div>
             <div className="flex items-center gap-1.5">
               <Wrench className="w-4 h-4 text-orange-500" />
               <span className="font-medium tabular-nums">{collectiveStats.repairPoints}</span>
