@@ -164,7 +164,7 @@
   }
 
   .data-table th {
-    @apply font-semibold text-left px-3 py-2 border-b border-border cursor-pointer select-none transition-colors;
+    @apply font-semibold text-left px-2 py-1.5 border-b border-border cursor-pointer select-none transition-colors;
     background: hsl(222 47% 14%);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -179,7 +179,7 @@
   }
 
   .data-table td {
-    @apply px-3 py-2 border-b border-border/50;
+    @apply px-2 py-1.5 border-b border-border/50;
   }
 
   .data-table tr {
