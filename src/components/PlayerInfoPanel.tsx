@@ -244,6 +244,15 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
       const requestTimestamp = Date.now();
       const startTime = Date.now();
       
+      // Request player data via local API
+      await fetch("http://localhost:8080/request-player", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tag })
+      });
+      
+      console.log('Requested player info for tag:', tag);
+      
       const pollForResponse = async (): Promise<void> => {
         if (Date.now() - startTime > POLL_TIMEOUT) {
           setError('Request timed out. Please try again.');
@@ -269,7 +278,6 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
       };
 
       pollForResponse();
-      console.log('Requesting player info for tag:', tag);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to request player info');
