@@ -1,73 +1,68 @@
-# Welcome to your Lovable project
+# 🏆 Nerambans Clash Royale Dashboard
 
-## Project info
+A full-stack dashboard project built to monitor **Clan Members**, **River Race**, and **Clan War** activity in Clash Royale.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+This system fetches live data from the **Clash Royale API**, stores it in **Firebase Realtime Database**, and displays everything through a **React.js web dashboard** for easy tracking and analysis.
 
-## How can I edit this code?
+👉 **Live Demo:** https://rahulm-3.github.io/nerambans-cr/
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🚀 Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- 📊 Real-time Clan Dashboard  
+- 👥 Clan Members statistics  
+- ⚔️ River Race & War performance tracking  
+- 🔥 Firebase Realtime Database integration  
+- 🌐 React.js frontend for visualization  
+- 🤖 Project scaffolded using Lovable AI  
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🏗️ Architecture Overview
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Clash Royale API  
+&nbsp;&nbsp;&nbsp;&nbsp;↓  
+Python Backend / Scripts  
+&nbsp;&nbsp;&nbsp;&nbsp;↓  
+Firebase Realtime Database  
+&nbsp;&nbsp;&nbsp;&nbsp;↓  
+React.js Frontend Dashboard
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Follow these steps:
+### Flow:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Fetch clan, river race, and war data from **Clash Royale API**
+2. Upload processed data to **Firebase Realtime Database**
+3. React.js website reads data from Firebase
+4. Dashboard displays live clan activity and stats
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🛠️ Tech Stack
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### Backend / Data Layer
+- Clash Royale Official API
+- Python
+- Firebase Realtime Database
 
-**Edit a file directly in GitHub**
+### Frontend
+- React.js
+- Tailwind / CSS (as used in project)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Tooling
+- Lovable AI (project generation & structure)
+- GitHub Pages (deployment)
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📂 Project Purpose
 
-## What technologies are used for this project?
+This dashboard helps:
 
-This project is built with:
+- Monitor clan member participation  
+- Track River Race contributions  
+- Analyze war activity  
+- Maintain overall clan performance  
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+It was built primarily to manage and improve coordination within the clan by providing a centralized, visual overview.
