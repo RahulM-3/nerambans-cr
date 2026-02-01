@@ -235,6 +235,11 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
   const [playerData, setPlayerData] = useState<PlayerData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Batch loading states
+  const [badgesShown, setBadgesShown] = useState(30);
+  const [cardsShown, setCardsShown] = useState(40);
+  const [battlesShown, setBattlesShown] = useState(10);
 
   // Helper to parse stringified JSON from Firebase (player and battlelog are stored as JSON strings)
   const parsePlayerData = (rawData: Record<string, unknown>): PlayerData | null => {
@@ -333,6 +338,10 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
   useEffect(() => {
     if (isOpen && playerTag) {
       requestPlayerInfo(playerTag);
+      // Reset batch counts when opening
+      setBadgesShown(30);
+      setCardsShown(40);
+      setBattlesShown(10);
     } else {
       setPlayerData(null);
       setError(null);
@@ -397,14 +406,23 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
               </div>
 
               {/* Quick Stats Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <StatCard icon={Swords} label="Battles" value={player.battleCount ?? 0} subValue={`${player.wins ?? 0}W / ${player.losses ?? 0}L`} />
-                <StatCard icon={Crown} label="3-Crown Wins" value={player.threeCrownWins ?? 0} />
-                <StatCard icon={Gift} label="Donations" value={player.donations ?? 0} subValue={`Total: ${(player.totalDonations ?? 0).toLocaleString()}`} />
-                <StatCard icon={Users} label="War Day Wins" value={player.warDayWins ?? 0} />
-                <StatCard icon={Target} label="Challenge Wins" value={player.challengeCardsWon ?? 0} subValue={`Max: ${player.challengeMaxWins ?? 0}`} />
-                <StatCard icon={Star} label="Star Points" value={(player as unknown as { starPoints?: number }).starPoints ?? 0} />
-              </div>
+              {(() => {
+                const wins = player.wins ?? 0;
+                const losses = player.losses ?? 0;
+                const total = wins + losses;
+                const winPct = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
+                const lossPct = total > 0 ? ((losses / total) * 100).toFixed(1) : '0.0';
+                return (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <StatCard icon={Swords} label="Battles" value={player.battleCount ?? 0} subValue={`${wins}W (${winPct}%) / ${losses}L (${lossPct}%)`} />
+                    <StatCard icon={Crown} label="3-Crown Wins" value={player.threeCrownWins ?? 0} />
+                    <StatCard icon={Gift} label="Donations" value={player.donations ?? 0} subValue={`Total: ${(player.totalDonations ?? 0).toLocaleString()}`} />
+                    <StatCard icon={Users} label="War Day Wins" value={player.warDayWins ?? 0} />
+                    <StatCard icon={Target} label="Challenge Wins" value={player.challengeCardsWon ?? 0} subValue={`Max: ${player.challengeMaxWins ?? 0}`} />
+                    <StatCard icon={Star} label="Star Points" value={(player as unknown as { starPoints?: number }).starPoints ?? 0} />
+                  </div>
+                );
+              })()}
 
               {/* Current Deck */}
               {player.currentDeck && player.currentDeck.length > 0 && (
@@ -421,14 +439,17 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
               {player.badges && player.badges.length > 0 && (
                 <CollapsibleSection title="Badges" count={player.badges.length}>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-60 overflow-y-auto">
-                    {player.badges.slice(0, 30).map((badge, i) => (
+                    {player.badges.slice(0, badgesShown).map((badge, i) => (
                       <BadgeDisplay key={i} badge={badge} />
                     ))}
                   </div>
-                  {player.badges.length > 30 && (
-                    <p className="text-xs text-muted-foreground text-center mt-2">
-                      +{player.badges.length - 30} more badges
-                    </p>
+                  {player.badges.length > badgesShown && (
+                    <button 
+                      onClick={() => setBadgesShown(prev => Math.min(prev + 30, player.badges.length))}
+                      className="text-xs text-primary hover:underline text-center mt-2 w-full cursor-pointer"
+                    >
+                      +{player.badges.length - badgesShown} more badges (click to load more)
+                    </button>
                   )}
                 </CollapsibleSection>
               )}
@@ -464,10 +485,18 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
               {battlelog && battlelog.length > 0 && (
                 <CollapsibleSection title="Recent Battles" count={battlelog.length}>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
-                    {battlelog.slice(0, 10).map((battle, i) => (
+                    {battlelog.slice(0, battlesShown).map((battle, i) => (
                       <BattleLogEntry key={i} battle={battle} />
                     ))}
                   </div>
+                  {battlelog.length > battlesShown && (
+                    <button 
+                      onClick={() => setBattlesShown(prev => Math.min(prev + 10, battlelog.length))}
+                      className="text-xs text-primary hover:underline text-center mt-2 w-full cursor-pointer"
+                    >
+                      +{battlelog.length - battlesShown} more battles (click to load more)
+                    </button>
+                  )}
                 </CollapsibleSection>
               )}
 
@@ -475,14 +504,17 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
               {player.cards && player.cards.length > 0 && (
                 <CollapsibleSection title="Card Collection" count={player.cards.length}>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto">
-                    {player.cards.slice(0, 40).map((card, i) => (
+                    {player.cards.slice(0, cardsShown).map((card, i) => (
                       <CardDisplay key={i} card={card} />
                     ))}
                   </div>
-                  {player.cards.length > 40 && (
-                    <p className="text-xs text-muted-foreground text-center mt-2">
-                      +{player.cards.length - 40} more cards
-                    </p>
+                  {player.cards.length > cardsShown && (
+                    <button 
+                      onClick={() => setCardsShown(prev => Math.min(prev + 40, player.cards.length))}
+                      className="text-xs text-primary hover:underline text-center mt-2 w-full cursor-pointer"
+                    >
+                      +{player.cards.length - cardsShown} more cards (click to load more)
+                    </button>
                   )}
                 </CollapsibleSection>
               )}
