@@ -66,6 +66,7 @@ export interface RiverRaceData {
   periodType: string;
   collectionEndTime: string | null;
   warEndTime: string | null;
+  endTime: string | null;
   clan: RiverRaceClan;
   allClans: RiverRaceClan[];
 }

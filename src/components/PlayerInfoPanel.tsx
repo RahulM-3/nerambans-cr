@@ -137,7 +137,7 @@ function CollapsibleSection({
   defaultOpen = false, 
   children 
 }: { 
-  title: string; 
+  title: React.ReactNode; 
   count?: number;
   defaultOpen?: boolean; 
   children: React.ReactNode;
@@ -553,9 +553,39 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                     );
                   };
 
+                  // Calculate PvP win/loss streak
+                  let pvpStreak = 0;
+                  let pvpStreakType: 'win' | 'loss' | null = null;
+                  for (const battle of pvpBattles) {
+                    const teamCrowns = battle.team?.[0]?.crowns ?? 0;
+                    const opponentCrowns = battle.opponent?.[0]?.crowns ?? 0;
+                    const isWin = teamCrowns > opponentCrowns;
+                    
+                    if (pvpStreakType === null) {
+                      pvpStreakType = isWin ? 'win' : 'loss';
+                      pvpStreak = 1;
+                    } else if ((isWin && pvpStreakType === 'win') || (!isWin && pvpStreakType === 'loss')) {
+                      pvpStreak++;
+                    } else {
+                      break;
+                    }
+                  }
+
                   return (
-                    <div className="pt-2">
-                      <p className="text-xs text-muted-foreground mb-2">Trophy Progression (PvP Battles)</p>
+                    <div className="pt-2 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">Trophy Progression (PvP Battles)</p>
+                        {/* PvP Win/Loss Streak */}
+                        <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-lg">
+                          <Flame className={cn("w-4 h-4", pvpStreakType === 'win' ? 'text-primary' : pvpStreakType === 'loss' ? 'text-destructive' : 'text-muted-foreground')} />
+                          <div className="text-xs">
+                            <span className={cn("font-semibold", pvpStreakType === 'win' ? 'text-primary' : pvpStreakType === 'loss' ? 'text-destructive' : '')}>
+                              {pvpStreak} {pvpStreakType === 'win' ? 'Win' : pvpStreakType === 'loss' ? 'Loss' : ''} Streak
+                            </span>
+                            <span className="text-muted-foreground ml-1">(PvP)</span>
+                          </div>
+                        </div>
+                      </div>
                       <ChartContainer config={chartConfig} className="h-32 w-full">
                         <LineChart data={trophyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -597,40 +627,10 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                 const winPct = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
                 const lossPct = total > 0 ? ((losses / total) * 100).toFixed(1) : '0.0';
                 
-                // Calculate win/loss streak from battlelog
-                let currentStreak = 0;
-                let streakType: 'win' | 'loss' | null = null;
-                if (battlelog && battlelog.length > 0) {
-                  for (const battle of battlelog) {
-                    const teamCrowns = battle.team?.[0]?.crowns ?? 0;
-                    const opponentCrowns = battle.opponent?.[0]?.crowns ?? 0;
-                    const isWin = teamCrowns > opponentCrowns;
-                    
-                    if (streakType === null) {
-                      streakType = isWin ? 'win' : 'loss';
-                      currentStreak = 1;
-                    } else if ((isWin && streakType === 'win') || (!isWin && streakType === 'loss')) {
-                      currentStreak++;
-                    } else {
-                      break;
-                    }
-                  }
-                }
-                
-                const streakLabel = streakType === 'win' ? 'Win Streak' : streakType === 'loss' ? 'Loss Streak' : 'Current Streak';
-                const streakColor = streakType === 'win' ? 'text-primary' : streakType === 'loss' ? 'text-destructive' : '';
-                
                 return (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <StatCard icon={Swords} label="Battles" value={player.battleCount ?? 0} subValue={`${wins}W (${winPct}%) / ${losses}L (${lossPct}%)`} />
                     <StatCard icon={Crown} label="3-Crown Wins" value={player.threeCrownWins ?? 0} />
-                    <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
-                      <Flame className={cn("w-4 h-4 shrink-0", streakType === 'win' ? 'text-primary' : streakType === 'loss' ? 'text-destructive' : 'text-muted-foreground')} />
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground truncate">{streakLabel}</p>
-                        <p className={cn("font-semibold text-sm", streakColor)}>{currentStreak} {currentStreak === 1 ? 'game' : 'games'}</p>
-                      </div>
-                    </div>
                     <StatCard icon={ArrowUpDown} label="Cards Donated" value={player.donations ?? 0} subValue={`Total: ${(player.totalDonations ?? 0).toLocaleString()}`} />
                     <StatCard icon={ArrowUpDown} label="Cards Received" value={player.donationsReceived ?? 0} />
                     <StatCard icon={Users} label="War Day Wins" value={player.warDayWins ?? 0} />
@@ -714,9 +714,43 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                   
                   return typeMatch && resultMatch;
                 });
+
+                // Calculate general win/loss streak from all battles
+                let generalStreak = 0;
+                let generalStreakType: 'win' | 'loss' | null = null;
+                for (const battle of battlelog) {
+                  const teamCrowns = battle.team?.[0]?.crowns ?? 0;
+                  const opponentCrowns = battle.opponent?.[0]?.crowns ?? 0;
+                  const isWin = teamCrowns > opponentCrowns;
+                  
+                  if (generalStreakType === null) {
+                    generalStreakType = isWin ? 'win' : 'loss';
+                    generalStreak = 1;
+                  } else if ((isWin && generalStreakType === 'win') || (!isWin && generalStreakType === 'loss')) {
+                    generalStreak++;
+                  } else {
+                    break;
+                  }
+                }
                 
                 return (
-                  <CollapsibleSection title="Recent Battles" count={filteredBattles.length}>
+                  <CollapsibleSection 
+                    title={
+                      <div className="flex items-center gap-3">
+                        <span>Recent Battles</span>
+                        {generalStreakType && (
+                          <div className={cn(
+                            "flex items-center gap-1 px-2 py-0.5 rounded text-xs",
+                            generalStreakType === 'win' ? 'bg-primary/10 text-primary' : 'bg-destructive/10 text-destructive'
+                          )}>
+                            <Flame className="w-3 h-3" />
+                            <span className="font-semibold">{generalStreak} {generalStreakType === 'win' ? 'Win' : 'Loss'} Streak</span>
+                          </div>
+                        )}
+                      </div>
+                    } 
+                    count={filteredBattles.length}
+                  >
                     {/* Filter controls */}
                     <div className="flex flex-wrap gap-2 mb-3">
                       <div className="flex items-center gap-1.5">

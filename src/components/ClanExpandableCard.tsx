@@ -11,6 +11,7 @@ interface ClanExpandableCardProps {
   trophyChange?: number;
   showDecksToday?: boolean;
   showCollectiveStats?: boolean;
+  isTrainingPeriod?: boolean;
 }
 
 export function ClanExpandableCard({ 
@@ -19,11 +20,16 @@ export function ClanExpandableCard({
   isOurClan, 
   trophyChange, 
   showDecksToday = false,
-  showCollectiveStats = false 
+  showCollectiveStats = false,
+  isTrainingPeriod = false
 }: ClanExpandableCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getRankIcon = (r: number) => {
+    // During training period, show default icon for all ranks
+    if (isTrainingPeriod) {
+      return <CircleDot className="w-5 h-5 text-muted-foreground" />;
+    }
     if (r === 1) return <Trophy className="w-5 h-5 text-yellow-500" />;
     if (r === 2) return <Medal className="w-5 h-5 text-gray-400" />;
     if (r === 3) return <Award className="w-5 h-5 text-amber-600" />;
@@ -37,7 +43,10 @@ export function ClanExpandableCard({
     if (!clan.participants) return { attacked: 0, fame: 0, repairPoints: 0, decksUsed: 0, decksUsedToday: 0, boatAttacks: 0 };
     
     const participants = clan.participants;
-    const attacked = participants.filter(p => p.decksUsed > 0).length;
+    // During training, use decksUsedToday to count attacked; otherwise use decksUsed
+    const attacked = isTrainingPeriod 
+      ? participants.filter(p => p.decksUsedToday > 0).length
+      : participants.filter(p => p.decksUsed > 0).length;
     const fame = participants.reduce((sum, p) => sum + p.fame, 0);
     const repairPoints = participants.reduce((sum, p) => sum + p.repairPoints, 0);
     const decksUsed = participants.reduce((sum, p) => sum + p.decksUsed, 0);
@@ -45,7 +54,7 @@ export function ClanExpandableCard({
     const boatAttacks = participants.reduce((sum, p) => sum + p.boatAttacks, 0);
     
     return { attacked, fame, repairPoints, decksUsed, decksUsedToday, boatAttacks };
-  }, [clan.participants]);
+  }, [clan.participants, isTrainingPeriod]);
 
   return (
     <div 
@@ -81,6 +90,14 @@ export function ClanExpandableCard({
               <div className="text-lg font-bold tabular-nums">{clan.fame.toLocaleString()}</div>
               <div className="text-xs text-muted-foreground">Fame</div>
             </div>
+            {clan.clanScore !== undefined && clan.clanScore > 0 && (
+              <div className="text-right">
+                <div className="font-semibold tabular-nums text-amber-500">
+                  {clan.clanScore.toLocaleString()}
+                </div>
+                <div className="text-xs text-muted-foreground">Trophies</div>
+              </div>
+            )}
             {trophyChange !== undefined && (
               <div className="text-right">
                 <div className={`font-semibold tabular-nums ${
@@ -88,7 +105,7 @@ export function ClanExpandableCard({
                 }`}>
                   {trophyChange > 0 && '+'}{trophyChange}
                 </div>
-                <div className="text-xs text-muted-foreground">Trophies</div>
+                <div className="text-xs text-muted-foreground">Change</div>
               </div>
             )}
             {isExpanded ? (

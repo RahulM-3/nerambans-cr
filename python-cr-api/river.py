@@ -1,10 +1,54 @@
 from api import api_get
-from firebase import fb_set_if_changed
-from config import CURRENT_RIVER_PATH, RIVER_RACE_LOG_PATH
+from firebase import fb_set_if_changed, fb_get
+from config import CURRENT_RIVER_PATH, RIVER_RACE_LOG_PATH, IST, UTC
+from datetime import datetime, timedelta, timezone
+
+def cr_format(dt):
+    return dt.astimezone(UTC).strftime("%Y%m%dT%H%M%S.000Z")
+
+def cr_to_dt(cr_str):
+    return datetime.strptime(cr_str, "%Y%m%dT%H%M%S.000Z").replace(tzinfo=UTC)
+
+def calculate_end_time():
+    now = datetime.now(IST)
+
+    reset = now.replace(hour=15, minute=25, second=0, microsecond=0)
+
+    if now >= reset:
+        reset += timedelta(days=1)
+
+    return cr_format(reset)
 
 # ======================================================
 # CURRENT RIVER RACE
 # ======================================================
+
+def get_delta_end_time():
+    """
+    Returns existing endTime if still in future.
+    Otherwise calculates + stores a new one.
+    """
+
+    data = fb_get(CURRENT_RIVER_PATH) or {}
+    stored = data.get("endTime")
+
+    now_utc = datetime.now(UTC)
+
+    # If already stored, check if expired
+    if stored:
+        try:
+            stored_dt = cr_to_dt(stored)
+            if now_utc < stored_dt:
+                return stored   # still valid
+        except Exception:
+            pass
+
+    # Expired or missing -> recalc
+    new_time = calculate_end_time()
+
+    fb_set_if_changed(f"{CURRENT_RIVER_PATH}/endTime", new_time)
+    return new_time
+
 
 def update_current_river_race():
     race = api_get("/clans/{tag}/currentriverrace")
@@ -42,8 +86,7 @@ def update_current_river_race():
         "sectionIndex": race.get("sectionIndex"),
         "periodIndex": race.get("periodIndex"),
         "periodType": race.get("periodType"),
-        "collectionEndTime": race.get("collectionEndTime"),
-        "warEndTime": race.get("warEndTime"),
+        "endTime": get_delta_end_time(),
         "allClans": all_clans
     }
 

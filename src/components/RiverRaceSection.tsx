@@ -2,11 +2,38 @@ import { useMemo } from 'react';
 import { RiverRaceData } from '@/types/clan';
 import { ClanExpandableCard } from './ClanExpandableCard';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatRaceDate } from '@/utils/dateUtils';
 
 interface RiverRaceSectionProps {
   riverRace: RiverRaceData;
   ourClanTag: string;
+}
+
+function getHoursRemaining(endTimeStr: string | null): string {
+  if (!endTimeStr) return 'N/A';
+  
+  // Format: "20260126T095506.000Z" -> parse to Date
+  const year = endTimeStr.slice(0, 4);
+  const month = endTimeStr.slice(4, 6);
+  const day = endTimeStr.slice(6, 8);
+  const hour = endTimeStr.slice(9, 11);
+  const minute = endTimeStr.slice(11, 13);
+  
+  const endDate = new Date(`${year}-${month}-${day}T${hour}:${minute}:00.000Z`);
+  const now = new Date();
+  const diffMs = endDate.getTime() - now.getTime();
+  
+  if (diffMs <= 0) return 'Ended';
+  
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+  if (hours > 24) {
+    const days = Math.floor(hours / 24);
+    const remainingHours = hours % 24;
+    return `${days}d ${remainingHours}h`;
+  }
+  
+  return `${hours}h ${minutes}m`;
 }
 
 export function RiverRaceSection({ riverRace, ourClanTag }: RiverRaceSectionProps) {
@@ -22,13 +49,15 @@ export function RiverRaceSection({ riverRace, ourClanTag }: RiverRaceSectionProp
   };
 
   const isOurClan = (tag: string) => tag === ourClanTag;
+  const isTraining = riverRace.periodType === 'training';
+  const endTime = riverRace.endTime || riverRace.warEndTime;
 
   return (
     <div className="space-y-6">
       {/* Race Info Header */}
       <Card>
         <CardContent className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <div className="text-xs text-muted-foreground uppercase tracking-wide">Race ID</div>
               <div className="text-lg font-bold">{riverRace.raceId}</div>
@@ -42,15 +71,11 @@ export function RiverRaceSection({ riverRace, ourClanTag }: RiverRaceSectionProp
               </div>
             </div>
             <div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wide">Collection Ends</div>
-              <div className="text-sm font-semibold">
-                {riverRace.collectionEndTime ? formatRaceDate(riverRace.collectionEndTime) : 'N/A'}
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">
+                {isTraining ? 'Training Day Ends In' : 'Battle Day Ends In'}
               </div>
-            </div>
-            <div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wide">War Ends</div>
               <div className="text-sm font-semibold">
-                {riverRace.warEndTime ? formatRaceDate(riverRace.warEndTime) : 'N/A'}
+                {getHoursRemaining(endTime)}
               </div>
             </div>
           </div>
@@ -68,6 +93,7 @@ export function RiverRaceSection({ riverRace, ourClanTag }: RiverRaceSectionProp
             isOurClan={isOurClan(clan.tag)}
             showDecksToday={true}
             showCollectiveStats={true}
+            isTrainingPeriod={isTraining}
           />
         ))}
         {sortedClans.length === 0 && (
