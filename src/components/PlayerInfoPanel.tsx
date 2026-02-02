@@ -213,21 +213,35 @@ function BattleLogEntry({ battle }: { battle: PlayerData['battlelog'][0] }) {
   const opponentCrowns = battle.opponent[0]?.crowns || 0;
   const isWin = teamCrowns > opponentCrowns;
   const opponentName = battle.opponent[0]?.name || 'Unknown';
+  const trophyChange = battle.team[0]?.trophyChange;
   
   return (
     <div className={cn(
       "flex items-center justify-between p-2 rounded text-xs",
       isWin ? "bg-primary/10 border-l-2 border-primary" : "bg-destructive/10 border-l-2 border-destructive"
     )}>
-      <div className="min-w-0">
-        <p className="font-medium truncate">vs {opponentName}</p>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="font-medium truncate">vs {opponentName}</p>
+          <span className="text-[10px] px-1.5 py-0.5 bg-muted rounded shrink-0">{battle.type}</span>
+        </div>
         <p className="text-[10px] text-muted-foreground">{battle.gameMode.name} • {battle.arena.name}</p>
       </div>
-      <div className="text-right shrink-0">
+      <div className="text-right shrink-0 ml-2">
         <p className={cn("font-bold", isWin ? "text-primary" : "text-destructive")}>
           {teamCrowns} - {opponentCrowns}
         </p>
-        <p className="text-[10px] text-muted-foreground">{isWin ? 'Victory' : 'Defeat'}</p>
+        <div className="flex items-center justify-end gap-1">
+          <span className="text-[10px] text-muted-foreground">{isWin ? 'Victory' : 'Defeat'}</span>
+          {trophyChange !== undefined && trophyChange !== 0 && (
+            <span className={cn(
+              "text-[10px] font-medium",
+              trophyChange > 0 ? "text-emerald-500" : "text-red-500"
+            )}>
+              {trophyChange > 0 ? '+' : ''}{trophyChange}🏆
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -410,16 +424,39 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
 
                 {/* Trophy Progression Chart from Battlelog */}
                 {battlelog && battlelog.length > 0 && (() => {
+                  // Helper to parse ISO-8601 battleTime (format: "20260126T095506.000Z")
+                  const parseBattleTime = (bt: string): Date => {
+                    const year = bt.slice(0, 4);
+                    const month = bt.slice(4, 6);
+                    const day = bt.slice(6, 8);
+                    const hour = bt.slice(9, 11);
+                    const min = bt.slice(11, 13);
+                    const sec = bt.slice(13, 15);
+                    return new Date(`${year}-${month}-${day}T${hour}:${min}:${sec}.000Z`);
+                  };
+
+                  const formatTime = (date: Date): string => {
+                    return date.toLocaleString('en-IN', {
+                      timeZone: 'Asia/Kolkata',
+                      day: '2-digit',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    });
+                  };
+
                   // Build trophy progression from battlelog (most recent first, so reverse for chart)
                   const trophyData = battlelog
-                    .filter(b => b.team?.[0]?.startingTrophies !== undefined)
-                    .map((b, idx) => {
+                    .filter(b => b.team?.[0]?.startingTrophies !== undefined && b.battleTime)
+                    .map((b) => {
                       const startTrophies = b.team[0].startingTrophies ?? 0;
                       const change = b.team[0].trophyChange ?? 0;
+                      const date = parseBattleTime(b.battleTime);
                       return {
-                        battle: battlelog.length - idx,
+                        time: date.getTime(),
+                        timeLabel: formatTime(date),
                         trophies: startTrophies + change,
-                        startingTrophies: startTrophies
                       };
                     })
                     .reverse();
@@ -437,10 +474,14 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                         <LineChart data={trophyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                           <XAxis 
-                            dataKey="battle" 
-                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 9 }}
+                            dataKey="timeLabel" 
+                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 8 }}
                             tickLine={false}
                             axisLine={false}
+                            interval="preserveStartEnd"
+                            angle={-20}
+                            textAnchor="end"
+                            height={40}
                           />
                           <YAxis 
                             tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 9 }}
@@ -449,7 +490,10 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                             width={40}
                             domain={['dataMin - 20', 'dataMax + 20']}
                           />
-                          <ChartTooltip content={<ChartTooltipContent />} />
+                          <ChartTooltip 
+                            content={<ChartTooltipContent />} 
+                            labelFormatter={(_, payload) => payload?.[0]?.payload?.timeLabel || ''}
+                          />
                           <Line 
                             type="monotone" 
                             dataKey="trophies" 
