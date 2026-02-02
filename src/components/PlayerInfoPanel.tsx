@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Loader2, Trophy, Swords, Users, Gift, Crown, Star, Target, ChevronDown } from 'lucide-react';
+import { Loader2, Trophy, Swords, Users, Crown, Target, ChevronDown, ArrowUpDown, Star } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from 'recharts';
 
 interface PlayerInfoPanelProps {
   playerTag: string | null;
@@ -412,14 +414,16 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                 const total = wins + losses;
                 const winPct = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
                 const lossPct = total > 0 ? ((losses / total) * 100).toFixed(1) : '0.0';
+                const donated = player.donations ?? 0;
+                const received = player.donationsReceived ?? 0;
+                const ratio = received > 0 ? (donated / received).toFixed(2) : donated > 0 ? '∞' : '0';
                 return (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <StatCard icon={Swords} label="Battles" value={player.battleCount ?? 0} subValue={`${wins}W (${winPct}%) / ${losses}L (${lossPct}%)`} />
                     <StatCard icon={Crown} label="3-Crown Wins" value={player.threeCrownWins ?? 0} />
-                    <StatCard icon={Gift} label="Donations" value={player.donations ?? 0} subValue={`Total: ${(player.totalDonations ?? 0).toLocaleString()}`} />
+                    <StatCard icon={ArrowUpDown} label="Donations" value={`${donated} / ${received}`} subValue={`Ratio: ${ratio} • Total: ${(player.totalDonations ?? 0).toLocaleString()}`} />
                     <StatCard icon={Users} label="War Day Wins" value={player.warDayWins ?? 0} />
                     <StatCard icon={Target} label="Challenge Wins" value={player.challengeCardsWon ?? 0} subValue={`Max: ${player.challengeMaxWins ?? 0}`} />
-                    <StatCard icon={Star} label="Star Points" value={(player as unknown as { starPoints?: number }).starPoints ?? 0} />
                   </div>
                 );
               })()}
@@ -519,36 +523,110 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                 </CollapsibleSection>
               )}
 
-              {/* League Statistics */}
+              {/* Trophy Progression Chart */}
               {player.leagueStatistics && (
-                <CollapsibleSection title="League Statistics">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    {player.leagueStatistics.currentSeason && (
-                      <div className="p-2 bg-muted/30 rounded text-xs">
-                        <p className="font-medium">Current Season</p>
-                        <p className="text-muted-foreground">
-                          Trophies: {player.leagueStatistics.currentSeason.trophies} 
-                          (Best: {player.leagueStatistics.currentSeason.bestTrophies})
-                        </p>
+                <CollapsibleSection title="Trophy Progression" defaultOpen>
+                  {(() => {
+                    const chartData: { season: string; trophies: number; best: number }[] = [];
+                    
+                    if (player.leagueStatistics?.bestSeason) {
+                      chartData.push({
+                        season: `Best (${player.leagueStatistics.bestSeason.id})`,
+                        trophies: player.leagueStatistics.bestSeason.trophies,
+                        best: player.leagueStatistics.bestSeason.trophies
+                      });
+                    }
+                    if (player.leagueStatistics?.previousSeason) {
+                      chartData.push({
+                        season: `Prev (${player.leagueStatistics.previousSeason.id})`,
+                        trophies: player.leagueStatistics.previousSeason.trophies,
+                        best: player.leagueStatistics.previousSeason.bestTrophies ?? player.leagueStatistics.previousSeason.trophies
+                      });
+                    }
+                    if (player.leagueStatistics?.currentSeason) {
+                      chartData.push({
+                        season: 'Current',
+                        trophies: player.leagueStatistics.currentSeason.trophies,
+                        best: player.leagueStatistics.currentSeason.bestTrophies ?? player.leagueStatistics.currentSeason.trophies
+                      });
+                    }
+
+                    const chartConfig = {
+                      trophies: { label: 'Trophies', color: 'hsl(43 96% 56%)' },
+                      best: { label: 'Best', color: 'hsl(199 89% 48%)' }
+                    };
+
+                    if (chartData.length === 0) {
+                      return <p className="text-xs text-muted-foreground">No league data available</p>;
+                    }
+
+                    return (
+                      <div className="space-y-4">
+                        <ChartContainer config={chartConfig} className="h-48 w-full">
+                          <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                            <XAxis 
+                              dataKey="season" 
+                              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+                              tickLine={false}
+                              axisLine={false}
+                            />
+                            <YAxis 
+                              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+                              tickLine={false}
+                              axisLine={false}
+                              width={45}
+                            />
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <Line 
+                              type="monotone" 
+                              dataKey="trophies" 
+                              stroke="hsl(43 96% 56%)" 
+                              strokeWidth={2}
+                              dot={{ fill: 'hsl(43 96% 56%)', strokeWidth: 2 }}
+                              activeDot={{ r: 6, fill: 'hsl(43 96% 56%)' }}
+                            />
+                            <Line 
+                              type="monotone" 
+                              dataKey="best" 
+                              stroke="hsl(199 89% 48%)" 
+                              strokeWidth={2}
+                              strokeDasharray="5 5"
+                              dot={{ fill: 'hsl(199 89% 48%)', strokeWidth: 2 }}
+                              activeDot={{ r: 6, fill: 'hsl(199 89% 48%)' }}
+                            />
+                          </LineChart>
+                        </ChartContainer>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          {player.leagueStatistics.currentSeason && (
+                            <div className="p-2 bg-muted/30 rounded text-xs">
+                              <p className="font-medium">Current Season</p>
+                              <p className="text-muted-foreground">
+                                Trophies: {player.leagueStatistics.currentSeason.trophies} 
+                                (Best: {player.leagueStatistics.currentSeason.bestTrophies})
+                              </p>
+                            </div>
+                          )}
+                          {player.leagueStatistics.previousSeason && (
+                            <div className="p-2 bg-muted/30 rounded text-xs">
+                              <p className="font-medium">Previous Season</p>
+                              <p className="text-muted-foreground">
+                                {player.leagueStatistics.previousSeason.id}: {player.leagueStatistics.previousSeason.trophies}
+                              </p>
+                            </div>
+                          )}
+                          {player.leagueStatistics.bestSeason && (
+                            <div className="p-2 bg-muted/30 rounded text-xs">
+                              <p className="font-medium">Best Season</p>
+                              <p className="text-muted-foreground">
+                                {player.leagueStatistics.bestSeason.id}: {player.leagueStatistics.bestSeason.trophies}
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    )}
-                    {player.leagueStatistics.previousSeason && (
-                      <div className="p-2 bg-muted/30 rounded text-xs">
-                        <p className="font-medium">Previous Season</p>
-                        <p className="text-muted-foreground">
-                          {player.leagueStatistics.previousSeason.id}: {player.leagueStatistics.previousSeason.trophies}
-                        </p>
-                      </div>
-                    )}
-                    {player.leagueStatistics.bestSeason && (
-                      <div className="p-2 bg-muted/30 rounded text-xs">
-                        <p className="font-medium">Best Season</p>
-                        <p className="text-muted-foreground">
-                          {player.leagueStatistics.bestSeason.id}: {player.leagueStatistics.bestSeason.trophies}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                    );
+                  })()}
                 </CollapsibleSection>
               )}
             </div>
