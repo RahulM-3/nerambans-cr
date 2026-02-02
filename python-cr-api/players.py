@@ -68,8 +68,6 @@ def update_player_info_if_requested():
 # ======================================================
 
 def player_request_worker():
-    print("Player request watcher started...\n")
-
     while True:
         try:
             update_player_info_if_requested()

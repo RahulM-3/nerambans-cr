@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Loader2, Trophy, Swords, Users, Crown, Target, ChevronDown, ArrowUpDown, Star } from 'lucide-react';
+import { Loader2, Trophy, Swords, Users, Crown, Target, ChevronDown, ArrowUpDown, Star, Flame, Filter } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from 'recharts';
@@ -256,6 +257,10 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
   const [badgesShown, setBadgesShown] = useState(30);
   const [cardsShown, setCardsShown] = useState(40);
   const [battlesShown, setBattlesShown] = useState(10);
+  
+  // Battle log filters
+  const [battleTypeFilter, setBattleTypeFilter] = useState<string>('all');
+  const [battleResultFilter, setBattleResultFilter] = useState<string>('all');
 
   // Helper to parse stringified JSON from Firebase (player and battlelog are stored as JSON strings)
   const parsePlayerData = (rawData: Record<string, unknown>): PlayerData | null => {
@@ -422,8 +427,10 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                   </div>
                 </div>
 
-                {/* Trophy Progression Chart from Battlelog */}
-                {battlelog && battlelog.length > 0 && (() => {
+                {/* Trophy Progression Chart from Battlelog - PvP only */}
+                {(() => {
+                  if (!battlelog || battlelog.length === 0) return null;
+                  
                   // Helper to parse ISO-8601 battleTime (format: "20260126T095506.000Z")
                   const parseBattleTime = (bt: string): Date => {
                     const year = bt.slice(0, 4);
@@ -435,7 +442,17 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                     return new Date(`${year}-${month}-${day}T${hour}:${min}:${sec}.000Z`);
                   };
 
-                  const formatTime = (date: Date): string => {
+                  // Short label for X-axis (just day/month)
+                  const formatShortDate = (date: Date): string => {
+                    return date.toLocaleString('en-IN', {
+                      timeZone: 'Asia/Kolkata',
+                      day: '2-digit',
+                      month: 'short',
+                    });
+                  };
+
+                  // Full label for tooltip
+                  const formatFullTime = (date: Date): string => {
                     return date.toLocaleString('en-IN', {
                       timeZone: 'Asia/Kolkata',
                       day: '2-digit',
@@ -446,42 +463,108 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                     });
                   };
 
-                  // Build trophy progression from battlelog (most recent first, so reverse for chart)
-                  const trophyData = battlelog
-                    .filter(b => b.team?.[0]?.startingTrophies !== undefined && b.battleTime)
+                  // PvP battle types
+                  const pvpTypes = ['PvP', 'pathOfLegend', 'ranked'];
+                  
+                  // Filter to only PvP battles with trophy data
+                  const pvpBattles = battlelog.filter(b => 
+                    pvpTypes.includes(b.type) && 
+                    b.team?.[0]?.startingTrophies !== undefined && 
+                    b.battleTime
+                  );
+
+                  if (pvpBattles.length === 0) {
+                    return (
+                      <div className="pt-2">
+                        <p className="text-xs text-muted-foreground mb-2">Trophy Progression</p>
+                        <div className="h-24 flex items-center justify-center bg-muted/20 rounded-lg border border-dashed border-muted-foreground/30">
+                          <p className="text-xs text-muted-foreground">No PvP battles available</p>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // Build trophy progression from PvP battlelog (most recent first, so reverse for chart)
+                  const trophyData = pvpBattles
                     .map((b) => {
                       const startTrophies = b.team[0].startingTrophies ?? 0;
                       const change = b.team[0].trophyChange ?? 0;
+                      const teamCrowns = b.team[0]?.crowns ?? 0;
+                      const opponentCrowns = b.opponent?.[0]?.crowns ?? 0;
+                      const opponentName = b.opponent?.[0]?.name ?? 'Unknown';
                       const date = parseBattleTime(b.battleTime);
+                      const isWin = teamCrowns > opponentCrowns;
                       return {
                         time: date.getTime(),
-                        timeLabel: formatTime(date),
+                        shortLabel: formatShortDate(date),
+                        timeLabel: formatFullTime(date),
                         trophies: startTrophies + change,
+                        trophyChange: change,
+                        opponent: opponentName,
+                        result: isWin ? 'Victory' : 'Defeat',
+                        crowns: `${teamCrowns} - ${opponentCrowns}`,
+                        gameMode: b.gameMode?.name ?? b.type,
+                        arena: b.arena?.name ?? 'Unknown',
                       };
                     })
                     .reverse();
-
-                  if (trophyData.length === 0) return null;
 
                   const chartConfig = {
                     trophies: { label: 'Trophies', color: 'hsl(43 96% 56%)' }
                   };
 
+                  // Custom tooltip for rich battle info
+                  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: typeof trophyData[0] }> }) => {
+                    if (!active || !payload || !payload.length) return null;
+                    const data = payload[0].payload;
+                    const isWin = data.result === 'Victory';
+                    return (
+                      <div className="bg-popover border border-border rounded-lg p-2 shadow-lg text-xs min-w-[140px]">
+                        <p className="font-medium text-foreground mb-1">{data.timeLabel}</p>
+                        <div className="space-y-0.5">
+                          <p className="flex justify-between">
+                            <span className="text-muted-foreground">Trophies:</span>
+                            <span className="font-semibold">{data.trophies.toLocaleString()}</span>
+                          </p>
+                          <p className="flex justify-between">
+                            <span className="text-muted-foreground">Change:</span>
+                            <span className={isWin ? 'text-emerald-500' : 'text-red-500'}>
+                              {data.trophyChange > 0 ? '+' : ''}{data.trophyChange}
+                            </span>
+                          </p>
+                          <p className="flex justify-between">
+                            <span className="text-muted-foreground">Opponent:</span>
+                            <span className="truncate max-w-[80px]">{data.opponent}</span>
+                          </p>
+                          <p className="flex justify-between">
+                            <span className="text-muted-foreground">Score:</span>
+                            <span>{data.crowns}</span>
+                          </p>
+                          <p className="flex justify-between">
+                            <span className="text-muted-foreground">Result:</span>
+                            <span className={isWin ? 'text-primary font-medium' : 'text-destructive font-medium'}>{data.result}</span>
+                          </p>
+                          <p className="flex justify-between">
+                            <span className="text-muted-foreground">Mode:</span>
+                            <span className="truncate max-w-[80px]">{data.gameMode}</span>
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  };
+
                   return (
                     <div className="pt-2">
-                      <p className="text-xs text-muted-foreground mb-2">Trophy Progression (Recent Battles)</p>
+                      <p className="text-xs text-muted-foreground mb-2">Trophy Progression (PvP Battles)</p>
                       <ChartContainer config={chartConfig} className="h-32 w-full">
                         <LineChart data={trophyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                           <XAxis 
-                            dataKey="timeLabel" 
-                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 8 }}
+                            dataKey="shortLabel" 
+                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 9 }}
                             tickLine={false}
                             axisLine={false}
                             interval="preserveStartEnd"
-                            angle={-20}
-                            textAnchor="end"
-                            height={40}
                           />
                           <YAxis 
                             tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 9 }}
@@ -490,10 +573,7 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                             width={40}
                             domain={['dataMin - 20', 'dataMax + 20']}
                           />
-                          <ChartTooltip 
-                            content={<ChartTooltipContent />} 
-                            labelFormatter={(_, payload) => payload?.[0]?.payload?.timeLabel || ''}
-                          />
+                          <Tooltip content={<CustomTooltip />} />
                           <Line 
                             type="monotone" 
                             dataKey="trophies" 
@@ -516,12 +596,43 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
                 const total = wins + losses;
                 const winPct = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
                 const lossPct = total > 0 ? ((losses / total) * 100).toFixed(1) : '0.0';
+                
+                // Calculate win/loss streak from battlelog
+                let currentStreak = 0;
+                let streakType: 'win' | 'loss' | null = null;
+                if (battlelog && battlelog.length > 0) {
+                  for (const battle of battlelog) {
+                    const teamCrowns = battle.team?.[0]?.crowns ?? 0;
+                    const opponentCrowns = battle.opponent?.[0]?.crowns ?? 0;
+                    const isWin = teamCrowns > opponentCrowns;
+                    
+                    if (streakType === null) {
+                      streakType = isWin ? 'win' : 'loss';
+                      currentStreak = 1;
+                    } else if ((isWin && streakType === 'win') || (!isWin && streakType === 'loss')) {
+                      currentStreak++;
+                    } else {
+                      break;
+                    }
+                  }
+                }
+                
+                const streakLabel = streakType === 'win' ? 'Win Streak' : streakType === 'loss' ? 'Loss Streak' : 'Current Streak';
+                const streakColor = streakType === 'win' ? 'text-primary' : streakType === 'loss' ? 'text-destructive' : '';
+                
                 return (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <StatCard icon={Swords} label="Battles" value={player.battleCount ?? 0} subValue={`${wins}W (${winPct}%) / ${losses}L (${lossPct}%)`} />
                     <StatCard icon={Crown} label="3-Crown Wins" value={player.threeCrownWins ?? 0} />
-                    <StatCard icon={ArrowUpDown} label="Donated" value={player.donations ?? 0} subValue={`Total: ${(player.totalDonations ?? 0).toLocaleString()}`} />
-                    <StatCard icon={ArrowUpDown} label="Received" value={player.donationsReceived ?? 0} />
+                    <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+                      <Flame className={cn("w-4 h-4 shrink-0", streakType === 'win' ? 'text-primary' : streakType === 'loss' ? 'text-destructive' : 'text-muted-foreground')} />
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground truncate">{streakLabel}</p>
+                        <p className={cn("font-semibold text-sm", streakColor)}>{currentStreak} {currentStreak === 1 ? 'game' : 'games'}</p>
+                      </div>
+                    </div>
+                    <StatCard icon={ArrowUpDown} label="Cards Donated" value={player.donations ?? 0} subValue={`Total: ${(player.totalDonations ?? 0).toLocaleString()}`} />
+                    <StatCard icon={ArrowUpDown} label="Cards Received" value={player.donationsReceived ?? 0} />
                     <StatCard icon={Users} label="War Day Wins" value={player.warDayWins ?? 0} />
                     <StatCard icon={Target} label="Challenge Wins" value={player.challengeCardsWon ?? 0} subValue={`Max: ${player.challengeMaxWins ?? 0}`} />
                   </div>
@@ -586,23 +697,87 @@ export function PlayerInfoPanel({ playerTag, playerName, isOpen, onClose }: Play
               )}
 
               {/* Battle Log */}
-              {battlelog && battlelog.length > 0 && (
-                <CollapsibleSection title="Recent Battles" count={battlelog.length}>
-                  <div className="space-y-1 max-h-60 overflow-y-auto">
-                    {battlelog.slice(0, battlesShown).map((battle, i) => (
-                      <BattleLogEntry key={i} battle={battle} />
-                    ))}
-                  </div>
-                  {battlelog.length > battlesShown && (
-                    <button 
-                      onClick={() => setBattlesShown(prev => Math.min(prev + 10, battlelog.length))}
-                      className="text-xs text-primary hover:underline text-center mt-2 w-full cursor-pointer"
-                    >
-                      +{battlelog.length - battlesShown} more battles (click to load more)
-                    </button>
-                  )}
-                </CollapsibleSection>
-              )}
+              {battlelog && battlelog.length > 0 && (() => {
+                // Get unique battle types from battlelog
+                const battleTypes = [...new Set(battlelog.map(b => b.type))];
+                
+                // Filter battles based on current filters
+                const filteredBattles = battlelog.filter(battle => {
+                  const teamCrowns = battle.team?.[0]?.crowns ?? 0;
+                  const opponentCrowns = battle.opponent?.[0]?.crowns ?? 0;
+                  const isWin = teamCrowns > opponentCrowns;
+                  
+                  const typeMatch = battleTypeFilter === 'all' || battle.type === battleTypeFilter;
+                  const resultMatch = battleResultFilter === 'all' || 
+                    (battleResultFilter === 'win' && isWin) || 
+                    (battleResultFilter === 'loss' && !isWin);
+                  
+                  return typeMatch && resultMatch;
+                });
+                
+                return (
+                  <CollapsibleSection title="Recent Battles" count={filteredBattles.length}>
+                    {/* Filter controls */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <div className="flex items-center gap-1.5">
+                        <Filter className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Filters:</span>
+                      </div>
+                      <Select value={battleTypeFilter} onValueChange={setBattleTypeFilter}>
+                        <SelectTrigger className="h-7 text-xs w-[120px] bg-background">
+                          <SelectValue placeholder="Battle Type" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Types</SelectItem>
+                          {battleTypes.map(type => (
+                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={battleResultFilter} onValueChange={setBattleResultFilter}>
+                        <SelectTrigger className="h-7 text-xs w-[100px] bg-background">
+                          <SelectValue placeholder="Result" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Results</SelectItem>
+                          <SelectItem value="win">Victories</SelectItem>
+                          <SelectItem value="loss">Defeats</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {(battleTypeFilter !== 'all' || battleResultFilter !== 'all') && (
+                        <button 
+                          onClick={() => { setBattleTypeFilter('all'); setBattleResultFilter('all'); }}
+                          className="text-xs text-muted-foreground hover:text-foreground underline"
+                        >
+                          Clear filters
+                        </button>
+                      )}
+                    </div>
+                    
+                    {filteredBattles.length === 0 ? (
+                      <div className="text-center py-4 text-xs text-muted-foreground">
+                        No battles match the selected filters
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-1 max-h-60 overflow-y-auto">
+                          {filteredBattles.slice(0, battlesShown).map((battle, i) => (
+                            <BattleLogEntry key={i} battle={battle} />
+                          ))}
+                        </div>
+                        {filteredBattles.length > battlesShown && (
+                          <button 
+                            onClick={() => setBattlesShown(prev => Math.min(prev + 10, filteredBattles.length))}
+                            className="text-xs text-primary hover:underline text-center mt-2 w-full cursor-pointer"
+                          >
+                            +{filteredBattles.length - battlesShown} more battles (click to load more)
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </CollapsibleSection>
+                );
+              })()}
 
               {/* Cards Collection */}
               {player.cards && player.cards.length > 0 && (

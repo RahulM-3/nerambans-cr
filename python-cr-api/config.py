@@ -35,7 +35,7 @@ UPDATES_PATH = "updates"
 
 # ================= GENERAL =================
 
-REFRESH_INTERVAL = 120
+REFRESH_INTERVAL = 60
 RATE_LIMIT_DELAY = 1.2
 
 UTC = pytz.utc
