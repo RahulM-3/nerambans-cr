@@ -17,6 +17,7 @@ if __name__ == "__main__":
     ).start()
 
     cycle = 1
+    now = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
 
     while True:
         start = time()
@@ -24,12 +25,9 @@ if __name__ == "__main__":
 
         os.system("cls" if os.name == "nt" else "clear")
 
-        now = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
-
         print("=" * 50)
-        print(f" Clash Royale Firebase Sync")
+        print(f" Clash Royale Firebase Sync - {now}")
         print(f" Cycle #{cycle}")
-        print(f" Started : {now} IST")
         print("=" * 50)
 
         print("\n[1/4] Clan info...")

@@ -69,10 +69,7 @@ def update_player_info_if_requested():
 
 def player_request_worker():
     while True:
-        try:
-            update_player_info_if_requested()
-        except Exception as e:
-            print("Player worker error:", e)
-
+        update_player_info_if_requested()
+        
         # fast polling, low load
         sleep(0.5)

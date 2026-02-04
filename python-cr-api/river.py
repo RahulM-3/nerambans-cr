@@ -23,25 +23,20 @@ def calculate_end_time():
 # CURRENT RIVER RACE
 # ======================================================
 
-def get_delta_end_time():
+def get_period_end_time(current_period_index: int):
     """
-    Returns existing endTime if still in future.
-    Otherwise calculates + stores a new one.
+    If periodIndex changed -> set endTime = now + 1 day
+    If same periodIndex -> reuse stored endTime
     """
 
     data = fb_get(CURRENT_RIVER_PATH) or {}
-    stored = data.get("endTime")
 
-    now_utc = datetime.now(UTC)
+    stored_end = data.get("endTime")
+    stored_period = data.get("periodIndex")
 
-    # If already stored, check if expired
-    if stored:
-        try:
-            stored_dt = cr_to_dt(stored)
-            if now_utc < stored_dt:
-                return stored   # still valid
-        except Exception:
-            pass
+    # Same period -> reuse existing endTime
+    if stored_period == current_period_index and stored_end:
+        return stored_end
 
     # Expired or missing -> recalc
     new_time = calculate_end_time()
@@ -86,7 +81,7 @@ def update_current_river_race():
         "sectionIndex": race.get("sectionIndex"),
         "periodIndex": race.get("periodIndex"),
         "periodType": race.get("periodType"),
-        "endTime": get_delta_end_time(),
+        "endTime": get_period_end_time(race.get("periodIndex")),
         "allClans": all_clans
     }
 

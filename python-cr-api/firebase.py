@@ -4,9 +4,12 @@ from helpers import json_hash
 from config import FIREBASE_ROOT, UPDATES_PATH
 
 def fb_get(path):
-    r = requests.get(f"{FIREBASE_ROOT}/{path}.json", timeout=20)
-    if r.status_code != 200:
-        return None
+    try:
+        r = requests.get(f"{FIREBASE_ROOT}/{path}.json", timeout=20)
+        if r.status_code != 200:
+            return None
+    except Exception as e:
+            print("Firebase error:", e)
     return r.json()
 
 def fb_put(path, data):
