@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Trophy, Medal, Award, CircleDot, Users, Layers, Ship, Wrench } from 'lucide-react';
+import { ChevronDown, ChevronRight, Trophy, Medal, Award, CircleDot, Users, Layers, Ship } from 'lucide-react';
 import { RiverRaceClan } from '@/types/clan';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -125,11 +125,6 @@ export function ClanExpandableCard({
               <span className="text-muted-foreground">Attacked</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Wrench className="w-4 h-4 text-orange-500" />
-              <span className="font-medium tabular-nums">{collectiveStats.repairPoints}</span>
-              <span className="text-muted-foreground">Repair</span>
-            </div>
-            <div className="flex items-center gap-1.5">
               <Ship className="w-4 h-4 text-purple-500" />
               <span className="font-medium tabular-nums">{collectiveStats.boatAttacks}</span>
               <span className="text-muted-foreground">Boat</span>
@@ -167,7 +162,6 @@ export function ClanExpandableCard({
                     <tr>
                       <th className="text-left px-3 py-2 font-medium text-muted-foreground">Name</th>
                       <th className="text-right px-3 py-2 font-medium text-muted-foreground">Fame</th>
-                      <th className="text-right px-3 py-2 font-medium text-muted-foreground">Repair</th>
                       <th className="text-right px-3 py-2 font-medium text-muted-foreground">Boat</th>
                       <th className="text-right px-3 py-2 font-medium text-muted-foreground">Decks</th>
                       {showDecksToday && (
@@ -189,7 +183,6 @@ export function ClanExpandableCard({
                           </Tooltip>
                         </td>
                         <td className="text-right px-3 py-1.5 tabular-nums">{p.fame.toLocaleString()}</td>
-                        <td className="text-right px-3 py-1.5 tabular-nums">{p.repairPoints}</td>
                         <td className="text-right px-3 py-1.5 tabular-nums">{p.boatAttacks}</td>
                         <td className="text-right px-3 py-1.5 tabular-nums">{p.decksUsed}</td>
                         {showDecksToday && (
@@ -199,7 +192,7 @@ export function ClanExpandableCard({
                     ))}
                     {sortedParticipants.length === 0 && (
                       <tr>
-                        <td colSpan={showDecksToday ? 6 : 5} className="text-center text-muted-foreground py-4">
+                        <td colSpan={showDecksToday ? 5 : 4} className="text-center text-muted-foreground py-4">
                           No participants
                         </td>
                       </tr>
