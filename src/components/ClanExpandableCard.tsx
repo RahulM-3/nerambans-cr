@@ -40,21 +40,18 @@ export function ClanExpandableCard({
 
   // Calculate collective stats from participants
   const collectiveStats = useMemo(() => {
-    if (!clan.participants) return { attacked: 0, fame: 0, repairPoints: 0, decksUsed: 0, decksUsedToday: 0, boatAttacks: 0 };
+    if (!clan.participants) return { attacked: 0, attackedToday: 0, fame: 0, decksUsed: 0, decksUsedToday: 0, boatAttacks: 0 };
     
     const participants = clan.participants;
-    // During training, use decksUsedToday to count attacked; otherwise use decksUsed
-    const attacked = isTrainingPeriod 
-      ? participants.filter(p => p.decksUsedToday > 0).length
-      : participants.filter(p => p.decksUsed > 0).length;
+    const attacked = participants.filter(p => p.decksUsed > 0).length;
+    const attackedToday = participants.filter(p => p.decksUsedToday > 0).length;
     const fame = participants.reduce((sum, p) => sum + p.fame, 0);
-    const repairPoints = participants.reduce((sum, p) => sum + p.repairPoints, 0);
     const decksUsed = participants.reduce((sum, p) => sum + p.decksUsed, 0);
     const decksUsedToday = participants.reduce((sum, p) => sum + p.decksUsedToday, 0);
     const boatAttacks = participants.reduce((sum, p) => sum + p.boatAttacks, 0);
     
-    return { attacked, fame, repairPoints, decksUsed, decksUsedToday, boatAttacks };
-  }, [clan.participants, isTrainingPeriod]);
+    return { attacked, attackedToday, fame, decksUsed, decksUsedToday, boatAttacks };
+  }, [clan.participants]);
 
   return (
     <div 
@@ -119,27 +116,44 @@ export function ClanExpandableCard({
         {/* Collective Stats Row */}
         {showCollectiveStats && (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2.5 pt-2.5 border-t border-border/50 text-sm">
-            <div className="flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-primary" />
-              <span className="font-medium tabular-nums">{collectiveStats.attacked}</span>
-              <span className="text-muted-foreground">Attacked</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Ship className="w-4 h-4 text-purple-500" />
-              <span className="font-medium tabular-nums">{collectiveStats.boatAttacks}</span>
-              <span className="text-muted-foreground">Boat</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Layers className="w-4 h-4 text-emerald-500" />
-              <span className="font-medium tabular-nums">{collectiveStats.decksUsed}</span>
-              <span className="text-muted-foreground">Decks</span>
-            </div>
-            {showDecksToday && (
+            {isTrainingPeriod ? (
+              /* Training day: only show Attacked Today */
               <div className="flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-blue-500" />
-                <span className="font-medium tabular-nums">{collectiveStats.decksUsedToday}</span>
-                <span className="text-muted-foreground">Today</span>
+                <Users className="w-4 h-4 text-primary" />
+                <span className="font-medium tabular-nums">{collectiveStats.attackedToday}</span>
+                <span className="text-muted-foreground">Attacked Today</span>
               </div>
+            ) : (
+              /* War day: show all stats + Attacked Today */
+              <>
+                <div className="flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-primary" />
+                  <span className="font-medium tabular-nums">{collectiveStats.attacked}</span>
+                  <span className="text-muted-foreground">Attacked</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-blue-500" />
+                  <span className="font-medium tabular-nums">{collectiveStats.attackedToday}</span>
+                  <span className="text-muted-foreground">Attacked Today</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Ship className="w-4 h-4 text-purple-500" />
+                  <span className="font-medium tabular-nums">{collectiveStats.boatAttacks}</span>
+                  <span className="text-muted-foreground">Boat</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Layers className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium tabular-nums">{collectiveStats.decksUsed}</span>
+                  <span className="text-muted-foreground">Decks</span>
+                </div>
+                {showDecksToday && (
+                  <div className="flex items-center gap-1.5">
+                    <Layers className="w-4 h-4 text-blue-500" />
+                    <span className="font-medium tabular-nums">{collectiveStats.decksUsedToday}</span>
+                    <span className="text-muted-foreground">Today</span>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
